@@ -21,15 +21,21 @@ package hexaround.game;
 import hexaround.config.*;
 
 import java.io.*;
+import java.util.LinkedList;
 
 public class HexAroundGameBuilder {
-    public static IHexAroundGameManager buildGameManager(String configurationFile) throws IOException {
-        HexAroundConfigurationMaker configurationMaker =
-            new HexAroundConfigurationMaker(configurationFile);
+    public static IHexAround1 buildGameManager(String configurationFile) throws IOException {
+        HexAroundConfigurationMaker configurationMaker = new HexAroundConfigurationMaker(configurationFile);
         GameConfiguration configuration = configurationMaker.makeConfiguration();
 
         // TODO: Use the configuration to build your game manager
+        // Make the code readable and use helper methods as needed.
+        // Add setters and getters to the game manager that the builder calls.
 
-        return null;
+        HexAroundFirstSubmission gameManager = new HexAroundFirstSubmission();
+        gameManager.setPlayers(configuration.players());
+        gameManager.setCreatures(configuration.creatures());
+
+        return gameManager;
     }
 }

@@ -27,8 +27,7 @@ import java.util.*;
  * @param maxDistance the maximum number of hexes that it can move in one turn
  * @param properties the properties that govern the creature's behavior.
  */
-public record CreatureDefinition(CreatureName name, int maxDistance,
-                                 Collection<CreatureProperty> properties) {
+public record CreatureDefinition(CreatureName name, int maxDistance, Collection<CreatureProperty> properties) {
     @Override
     public String toString() {
         return "\tCreatureDefinition{" +
