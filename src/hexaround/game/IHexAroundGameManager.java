@@ -15,7 +15,8 @@
 
 package hexaround.game;
 
-import hexaround.required.*;
+import hexaround.rules.CreatureName;
+import hexaround.move.*;
 
 /**
  * This interface describes the behavior of HexAround from the client's viewpoint.

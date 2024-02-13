@@ -1,27 +1,45 @@
 package hexaround.board;
 
 import hexaround.config.CreatureDefinition;
+import hexaround.rules.CreatureName;
 
+import javax.swing.text.html.Option;
 import java.util.LinkedList;
+import java.util.Optional;
 
 /**
  *
  */
 public class Tile {
+    private LinkedList<CreatureName> creatures = null;
 
-    private LinkedList<CreatureDefinition> creatures = new LinkedList<>();
+    public Tile() {
+        this.creatures = new LinkedList<>();
+    }
 
-    public Tile() {}
-
-    public void addCreature(CreatureDefinition creature) {
+    /**
+     *
+     * @param creature
+     */
+    public void addCreature(CreatureName creature) {
         this.creatures.add(creature);
     }
 
-    public CreatureDefinition removeCreature() {
-        // Not sure how to handle this yet.
-        // If there is a stack of creatures, how to know which one to move?
-        // Player gives coordinates, and you give options for which piece to move?
-        // What if two red ducks on this tile and neither are trapped? How to decide which to move?
-        return null;
+    /**
+     *
+     * @return
+     */
+    public LinkedList<CreatureName> getCreatures() {
+        return new LinkedList<>(this.creatures);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Optional<CreatureName> getFirstCreature() {
+        if(this.creatures.isEmpty()) return Optional.empty();
+
+        return Optional.of(this.creatures.get(0));
     }
 }

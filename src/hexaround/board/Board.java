@@ -1,53 +1,60 @@
 package hexaround.board;
 
-import java.util.ArrayList;
+import hexaround.rules.CreatureName;
+
+import java.util.HashMap;
+import java.util.Optional;
 
 public class Board {
-    private int count = 0;
-    private int offset = 0;
-    private ArrayList<ArrayList<Tile>> tiles = new ArrayList<>();
+    private HashMap<CoordinatePair, Tile> tiles = null;
 
-    public Board(int count) {
-        this.count = count;
-        this.offset = count / 2;
-
-        this.initBoard();
+    public Board() {
+        this.tiles = new HashMap<>();
     }
 
-    @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder();
-
-        for(int r = 0; r < this.count; r++) {
-            StringBuilder row = new StringBuilder(" ");
-
-            for(int c = 0; c < this.count; c++) {
-                row.append(
-                        this.tiles.get(r).get(c) != null ?
-                        String.format("(%d, %d) ", r - this.offset, c - this.offset) :
-                        "(null) "
-                );
-            }
-
-            result.append(String.format("[%s]\n", row.toString()));
-        }
-
-        return result.toString();
+    /**
+     *
+     */
+    public int calculateDistance(int x1, int y1, int x2, int y2) {
+        return (Math.abs(x1 - x2) + Math.abs(x1 + y1 - x2 - y2) + Math.abs(y1 - y2)) / 2;
     }
 
-    private void initBoard() {
-        for (int r = 0; r < this.count; r++) {
-            this.tiles.add(new ArrayList<>());
+    /**
+     *
+     * @param x
+     * @param y
+     */
+    private void createTileIfNotExists(int x, int y) {
+       CoordinatePair key = new CoordinatePair(x, y);
 
-            int shift = this.offset - r - 1;
+       if(this.tiles.containsKey(key)) return;
 
-            for (int c = 0; c < this.count; c++) {
-                this.tiles.get(r).add(
-                        c > shift && c <= this.count + shift ?
-                        new Tile() :
-                        null
-                );
-            }
-        }
+       this.tiles.put(key, new Tile());
+    }
+
+    /**
+     *
+     * @param x
+     * @param y
+     * @return
+     */
+    public Optional<CreatureName> getCreatureAt(int x, int y) {
+        CoordinatePair key = new CoordinatePair(x, y);
+
+        if(!this.tiles.containsKey(key)) return Optional.empty();
+
+        return this.tiles.get(key).getFirstCreature();
+    }
+
+    /**
+     *
+     * @param creature
+     * @param x
+     * @param y
+     */
+    public void placeCreature(CreatureName creature, int x, int y) {
+        this.createTileIfNotExists(x, y);
+
+        this.tiles.get(new CoordinatePair(x, y)).addCreature(creature);
     }
 }

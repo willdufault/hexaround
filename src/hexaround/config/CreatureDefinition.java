@@ -18,7 +18,8 @@
 
 package hexaround.config;
 
-import hexaround.required.*;
+import hexaround.rules.CreatureName;
+import hexaround.rules.CreatureProperty;
 
 import java.util.*;
 
