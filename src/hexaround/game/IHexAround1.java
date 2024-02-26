@@ -1,9 +1,9 @@
 package hexaround.game;
 
-import hexaround.rules.CreatureName;
-import hexaround.rules.CreatureProperty;
+import hexaround.game.rules.CreatureName;
+import hexaround.game.rules.CreatureProperty;
 
-public interface IHexAround1 extends IHexAroundGameManager {
+public interface IHexAround1 extends IHexAroundGameManager{
     CreatureName getCreatureAt(int x, int y);
     boolean hasProperty(int x, int y, CreatureProperty property);
     boolean isOccupied(int x, int y);

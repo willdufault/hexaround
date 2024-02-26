@@ -1,200 +1,177 @@
 package hexaround.game;
 
-import hexaround.board.Board;
-import hexaround.config.CreatureDefinition;
-import hexaround.config.PlayerConfiguration;
-import hexaround.rules.CreatureName;
-import hexaround.rules.CreatureProperty;
-import hexaround.move.*;
+import hexaround.config.*;
+import hexaround.game.board.*;
+import hexaround.game.board.coordinate.*;
+import hexaround.game.move.MoveResponse;
+import hexaround.game.rules.CreatureName;
+import hexaround.game.rules.CreatureProperty;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
-public class HexAroundFirstSubmission implements IHexAround1 {
+import static hexaround.game.move.MoveResult.*;
 
-    private ArrayList<PlayerConfiguration> players = null;
-    private ArrayList<CreatureDefinition> creatures = null;
-    private Board board = null;
+public class HexAroundFirstSubmission implements IHexAround1{
+
+    private HexAroundBoard board = null;
+    private Map<CreatureName, CreatureDefinition> creatures;
 
     /**
      * This is the default constructor, and the only constructor
      * that you can use. The builder creates an instance using
-     * this constructor. You should add getters and setters as
+     * this connector. You should add getters and setters as
      * necessary for any instance variables that you create and
      * will be filled in by the builder.
      */
     public HexAroundFirstSubmission() {
-        this.players = new ArrayList<>();
-        this.creatures = new ArrayList<>();
-        this.board = new Board();
+        // Nothing to do
     }
 
     /**
      * Given the x and y-coordinates for a hex, return the name
      * of the creature on that coordinate.
-     * @param x The x-coordinate.
-     * @param y The y-coordinate.
+     * @param x
+     * @param y
      * @return the name of the creature on (x, y), or null if there
      *  is no creature.
      */
     @Override
     public CreatureName getCreatureAt(int x, int y) {
-        return this.board.getCreatureAt(x, y).orElse(null);
+        return board.getCreatureAt(x, y);
     }
 
     /**
      * Determine if the creature at the x and y-coordinates has the specified
      * property. You can assume that there will be a creature at the specified
      * location.
-     * @param x The x-coordinate.
-     * @param y The y-coordinate.
+     * @param x
+     * @param y
      * @param property the property to look for.
      * @return true if the creature at (x, y) has the specified property,
      *  false otherwise.
      */
     @Override
     public boolean hasProperty(int x, int y, CreatureProperty property) {
-        Optional<CreatureName> creature = this.board.getCreatureAt(x, y);
-
-        if(creature.isEmpty()) return false;
-
-        return this.creatureHasProperty(creature.get(), property);
-    }
-
-    /**
-     * Determine if the creature has the property.
-     * @param creature The creature.
-     * @param property The property to check for.
-     * @return True if the creature has the property.
-     */
-    private boolean creatureHasProperty(CreatureName creature, CreatureProperty property) {
-        // A hashmap would be better here, but the list is so small, it doesn't really matter.
-        for(CreatureDefinition definition : this.creatures) {
-            if(definition.name() != creature) continue;
-
-            return definition.properties().contains(property);
+        boolean result = false;
+        CreatureName creature = board.getCreatureAt(x, y);
+        if (creature != null) {
+            CreatureDefinition cd = creatures.get(creature);
+            if (cd != null) {
+                result = cd.properties().contains(property);
+            }
         }
-
-        // Creature is not in the game.
-        return false;
+        return result;
     }
 
     /**
      * Given the x and y-coordinate of a hex, determine if there is a
      * piece on that hex on the board.
-     * @param x The x-coordinate.
-     * @param y The y-coordinate.
+     * @param x
+     * @param y
      * @return true if there is a piece on the hex, false otherwise.
      */
     @Override
     public boolean isOccupied(int x, int y) {
-        // use helpers from before
-        return this.getCreatureAt(x, y) != null;
+        return board.isCreatureAt(x,y );
     }
 
     /**
      * Given the coordinates for two hexes, (x1, y1) and (x2, y2),
-     * return whether the piece at (x1, y1) could reach the other hex.
+     * return whether the piece at (x1, y1) could reach the other
+     * hex.
      * You can assume that there will be a piece at (x1, y1).
      * The distance is just the distance between the two hexes. You
      * do not have to do any other checking.
-     * @param x1 The x-coordinate of the piece.
-     * @param y1 The y-coordinate of the piece.
-     * @param x2 The x-coordinate of the destination.
-     * @param y2 The y-coordinate of the destination.
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
      * @return true if the distance between the two hexes is less
      * than or equal to the maximum distance property for the piece
      * at (x1, y1). Return false otherwise.
      */
     @Override
     public boolean canReach(int x1, int y1, int x2, int y2) {
-        if(!isOccupied(x1, y1)) return false;
-
-        return this.getMaxDistance(this.getCreatureAt(x1, y1)) <= this.board.calculateDistance(x1, y1, x2, y2);
-    }
-
-    /**
-     * Get the max distance of the given creature.
-     * @param creature The creature.
-     * @return The max allowed distance for the creature.
-     */
-    private int getMaxDistance(CreatureName creature) {
-        // A hashmap would be better here, but the list is so small, it doesn't really matter.
-        for(CreatureDefinition definition : this.creatures) {
-            if(definition.name() != creature) continue;
-
-            return definition.maxDistance();
+        boolean result = false;
+        CreatureName creature = getCreatureAt(x1, y1);
+        if (creature != null) {
+            CreatureDefinition cd = creatures.get(creature);
+            int maxDistance = cd.maxDistance();
+            HexCoordinate c1 = new HexCoordinate(x1, y1);
+            int actualDistance = c1.distanceTo(new HexCoordinate(x2, y2));
+            result = maxDistance >= actualDistance;
         }
-
-        // Creature is not in the game.
-        return -1;
+        return result;
     }
 
     /**
      * For this submission, just put the piece on the board. You
      * can assume that the hex (x, y) is empty. You do not have to do
      * any checking.
-     * @param creature The creature to put on the board.
-     * @param x The x-coordinate to put the creature on.
-     * @param y The y-coordinate to put the creature on.
+     * @param creature
+     * @param x
+     * @param y
      * @return a response, or null. It is not going to be checked.
      */
     @Override
     public MoveResponse placeCreature(CreatureName creature, int x, int y) {
-        // TODO: Add legality checks here.
-        this.board.placeCreature(creature, x, y);
+        board.placeCreatureAt(creature, x, y);
 
-        // TODO: Eventually be a move response.
-        return null;
+        // New for submission 2.
+        // Copy-pasted "Legal move".
+        return new MoveResponse(OK, "Legal move");
     }
 
     /**
-     * This is never used in this submission. You do not have to do anything.
-     * @param creature
-     * @param fromX
-     * @param fromY
-     * @param toX
-     * @param toY
-     * @return
+     * New for submission 2.
      */
     @Override
     public MoveResponse moveCreature(CreatureName creature, int fromX, int fromY, int toX, int toY) {
-        // nice, skip for now
-        return null;
+        if(!isLegalMove(creature, fromX, fromY, toX, toY))
+            // Copy-pasted "Colony is not connected, try again".
+            return new MoveResponse(MOVE_ERROR, "Colony is not connected, try again");
+
+        this.board.removeCreature(fromX, fromY);
+        this.board.placeCreatureAt(creature, toX, toY);
+        // Copy-pasted "Legal move".
+        return new MoveResponse(OK, "Legal move");
     }
 
-    /**
-     * Get the players.
-     * @return The list of players.
-     */
-    public ArrayList<PlayerConfiguration> getPlayers() {
-        return new ArrayList<>(this.players);
-    }
+    // New for submission 2.
 
     /**
-     * Get the creatures.
-     * @return The list of creatures.
-     */
-    public ArrayList<CreatureDefinition> getCreatures() {
-        return new ArrayList<>(this.creatures);
-    }
-
-    /**
-     * Set the players list to the given list of players.
+     * New for submission 2.
      *
-     * @param players List of players.
+     * Return true if the given move satisfies the following conditions:
+     *   1) The move is within the piece's max distance.
+     *   2) The colony will remain connected after the piece is moved.
      */
-    public void setPlayers(Collection<PlayerConfiguration> players) {
-        this.players = new ArrayList<>(players);
+    private boolean isLegalMove(CreatureName creature, int fromX, int fromY, int toX, int toY) {
+        if(!board.isCreatureAt(fromX, fromY)) return false;
+
+        if(!canReach(fromX, fromY, toX, toY)) return false;
+
+        // Move the piece and check that the colony is still connected.
+        this.board.removeCreature(fromX, fromY);
+        this.board.placeCreatureAt(creature, toX, toY);
+        boolean connected = this.board.isColonyConnected();
+
+        // Move the piece back.
+        this.board.removeCreature(toX, toY);
+        this.board.placeCreatureAt(creature, fromX, fromY);
+
+        return connected;
     }
 
-    /**
-     * Set the creatures list to the given list of creatures.
-     *
-     * @param creatures List of creatures.
-     */
-    public void setCreatures(Collection<CreatureDefinition> creatures) {
-        this.creatures = new ArrayList<>(creatures);
+    /************************************ Helpers *********************************/
+    public void setBoard(HexAroundBoard board) {
+        this.board = board;
+    }
+
+    public void setCreatures(Collection<CreatureDefinition> creatureDefs) {
+        creatures = new HashMap<>();
+        for (CreatureDefinition cd : creatureDefs) {
+            creatures.put(cd.name(), cd);
+        }
     }
 }

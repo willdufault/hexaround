@@ -26,7 +26,9 @@ import java.util.*;
  * @param creatures
  * @param players
  */
-public record GameConfiguration(Collection<CreatureDefinition> creatures, Collection<PlayerConfiguration> players) {
+public record GameConfiguration(Collection<CreatureDefinition> creatures,
+    Collection<PlayerConfiguration> players) {
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

@@ -19,21 +19,22 @@
 package hexaround.game;
 
 import hexaround.config.*;
+import hexaround.game.board.*;
 
 import java.io.*;
-import java.util.LinkedList;
 
 public class HexAroundGameBuilder {
     public static IHexAround1 buildGameManager(String configurationFile) throws IOException {
-        HexAroundConfigurationMaker configurationMaker = new HexAroundConfigurationMaker(configurationFile);
+        HexAroundConfigurationMaker configurationMaker =
+            new HexAroundConfigurationMaker(configurationFile);
         GameConfiguration configuration = configurationMaker.makeConfiguration();
+//        System.out.println(configuration);
+        HexAroundFirstSubmission gameManager = new HexAroundFirstSubmission();    // an empty game manager
 
         // TODO: Use the configuration to build your game manager
         // Make the code readable and use helper methods as needed.
         // Add setters and getters to the game manager that the builder calls.
-
-        HexAroundFirstSubmission gameManager = new HexAroundFirstSubmission();
-        gameManager.setPlayers(configuration.players());
+        gameManager.setBoard(new HexAroundBoard());
         gameManager.setCreatures(configuration.creatures());
 
         return gameManager;

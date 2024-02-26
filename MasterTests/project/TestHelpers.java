@@ -9,8 +9,7 @@
  *  2) You may not remove this copyright, even if you have modified this file.
  */
 
-package hexaround.move;
+package project;
 
-public enum MoveResult {
-    OK, RED_WON, BLUE_WON, DRAW, MOVE_ERROR
+public class TestHelpers {
 }

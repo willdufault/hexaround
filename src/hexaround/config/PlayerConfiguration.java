@@ -17,8 +17,8 @@
 
 package hexaround.config;
 
-import hexaround.rules.CreatureName;
-import hexaround.rules.PlayerName;
+import hexaround.game.rules.CreatureName;
+import hexaround.game.rules.PlayerName;
 
 import java.util.*;
 
