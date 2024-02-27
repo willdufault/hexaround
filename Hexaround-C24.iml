@@ -7,7 +7,7 @@
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/MasterConfigurations" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/MasterTests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/mastertest" isTestSource="true" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

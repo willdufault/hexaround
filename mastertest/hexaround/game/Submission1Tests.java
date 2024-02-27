@@ -41,7 +41,7 @@ public class Submission1Tests extends BaseTestMaster {
     @BeforeEach
     public void setup () {
         try {
-            manager = HexAroundGameBuilder.buildGameManager("MasterConfigurations/Submission1.hgc");
+            manager = HexAroundGameBuilder.buildGameManager("mastertest/config/Submission1.hgc");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

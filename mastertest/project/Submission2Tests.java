@@ -40,7 +40,7 @@ public class Submission2Tests extends BaseTestMaster {
     public void setup () {
         try {
             manager = HexAroundGameBuilder.buildGameManager(
-                "MasterTests/MasterConfigurations/Submission2.hgc");
+                "mastertest/config/Submission2.hgc");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
