@@ -14,7 +14,7 @@ package project;
 import hexaround.game.*;
 import hexaround.game.move.MoveResponse;
 import hexaround.game.move.MoveResult;
-import hexaround.game.rules.CreatureName;
+import hexaround.game.rule.CreatureName;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;

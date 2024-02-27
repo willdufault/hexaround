@@ -14,7 +14,8 @@
 package hexaround.game.board;
 
 import hexaround.game.board.coordinate.*;
-import hexaround.game.rules.CreatureName;
+import hexaround.game.board.piece.CreaturePiece;
+import hexaround.game.rule.CreatureName;
 
 import java.util.*;
 
@@ -26,9 +27,10 @@ import static hexaround.game.board.coordinate.HexCoordinate.*;
  * The board is assumed to be infinite.
  */
 public class HexAroundBoard {
-    private Map<HexCoordinate, CreatureName> occupiedHexes;
+    private Map<HexCoordinate, LinkedList<CreaturePiece>> occupiedHexes = null;
 
-    private HexCoordinate blueButterfly = null, redButterfly = null;
+    private HexCoordinate blueButterfly = null;
+    private HexCoordinate redButterfly = null;
 
     public HexAroundBoard() {
         occupiedHexes = new HashMap<>();
@@ -41,7 +43,11 @@ public class HexAroundBoard {
      *  null if there is none.
      */
     public CreatureName getCreatureAt(int x, int y) {
-        return occupiedHexes.get(makeCoordinate(x, y));
+        HexCoordinate hex = makeCoordinate(x, y);
+
+        if(!this.occupiedHexes.containsKey(hex)) return null;
+
+        return occupiedHexes.get(makeCoordinate(x, y)).get(0).creature();
     }
 
     public boolean isCreatureAt(int x, int y) {
@@ -49,10 +55,25 @@ public class HexAroundBoard {
     }
 
     /**
-     * Removes the creature at the given coordinate..
+     * Removes the creature at the given coordinate.
      */
-    public void removeCreature(int x, int y) {
-        this.occupiedHexes.remove(makeCoordinate(x, y));
+    public void removeCreature(CreatureName creature, boolean team, int x, int y) {
+        HexCoordinate hex = makeCoordinate(x, y);
+        LinkedList<CreaturePiece> pieces = this.occupiedHexes.get(hex);
+
+        if(pieces.size() == 1) {
+            this.occupiedHexes.remove(hex);
+            return;
+        }
+
+        // Remove the first matching instance.
+        for(CreaturePiece cp : pieces) {
+            if (cp.creature().name().equals(creature.name()) && cp.team() == team) {
+                pieces.remove(cp);
+                System.out.println("removing" + cp);
+                break;
+            }
+        }
     }
 
     /**
@@ -67,6 +88,8 @@ public class HexAroundBoard {
 
     /**
      * Recursively count all nodes directly connected to hex.
+     *
+     * NOTE: Could replace with union find.
      */
     private int getClusterSize(HexCoordinate hex, HashSet<HexCoordinate> seen) {
         if(!this.occupiedHexes.containsKey(hex)) return 0;
@@ -77,9 +100,8 @@ public class HexAroundBoard {
         // Include this hex.
         int count = 1;
 
-        for(HexCoordinate neighbor : hex.neighbors()) {
+        for(HexCoordinate neighbor : hex.neighbors())
             count += getClusterSize(neighbor, seen);
-        }
 
         return count;
     }
@@ -91,9 +113,20 @@ public class HexAroundBoard {
      * @param y
      * @return true if okay, false if there is a piece on the location
      */
-    public void placeCreatureAt(CreatureName creature, int x, int y) {
+    public void placeCreatureAt(CreatureName creature, boolean team, int x, int y) {
         HexCoordinate hex = makeCoordinate(x, y);
-        occupiedHexes.put(hex, creature);
-    }
 
+        if(!this.occupiedHexes.containsKey(hex))
+            this.occupiedHexes.put(hex, new LinkedList<>());
+
+        this.occupiedHexes.get(hex).add(new CreaturePiece(creature, team));
+
+        if(creature.name().equals(CreatureName.BUTTERFLY.name())) {
+            if(team)
+                this.blueButterfly = hex;
+
+            else
+                this.redButterfly = hex;
+        }
+    }
 }

@@ -9,7 +9,7 @@
  *  2) You may not remove this copyright, even if you have modified this file.
  */
 
-package hexaround.game.rules;
+package hexaround.game.rule;
 
 /**
  * This enumeration just provides symbols for the different types of creatures

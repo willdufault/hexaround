@@ -4,8 +4,8 @@ import hexaround.config.*;
 import hexaround.game.board.*;
 import hexaround.game.board.coordinate.*;
 import hexaround.game.move.MoveResponse;
-import hexaround.game.rules.CreatureName;
-import hexaround.game.rules.CreatureProperty;
+import hexaround.game.rule.CreatureName;
+import hexaround.game.rule.CreatureProperty;
 
 import java.util.*;
 
@@ -14,7 +14,14 @@ import static hexaround.game.move.MoveResult.*;
 public class HexAroundFirstSubmission implements IHexAround1{
 
     private HexAroundBoard board = null;
-    private Map<CreatureName, CreatureDefinition> creatures;
+    private Map<CreatureName, CreatureDefinition> creatures = null;
+    // Boolean to keep track of which team's turn it is.
+    private boolean team = true;
+    // 2 moves = 1 turn. (One move from both players.)
+    private int moveCount = 0;
+    // BLUE MOVES FIRST.
+    private boolean blueButterflyDown = false;
+    private boolean redButterflyDown = false;
 
     /**
      * This is the default constructor, and the only constructor
@@ -25,6 +32,14 @@ public class HexAroundFirstSubmission implements IHexAround1{
      */
     public HexAroundFirstSubmission() {
         // Nothing to do
+    }
+
+    public boolean getTeam() {
+        return this.team;
+    }
+
+    public int getMoveCount() {
+        return this.moveCount;
     }
 
     /**
@@ -105,6 +120,33 @@ public class HexAroundFirstSubmission implements IHexAround1{
     }
 
     /**
+     * Determines if the current team's butterfly is down.
+     * @return True if the butterfly is down.
+     */
+    private boolean isButterflyDown() {
+        // BLUE MOVES FIRST.
+        return this.team ? this.blueButterflyDown : this.redButterflyDown;
+    }
+
+    /**
+     * Determines if it is turn four or later.
+     * @return True if it is turn four or later.
+     */
+    private boolean isTurnFourOrLater() {
+        // 1 turn = 2 moves.
+        return this.moveCount >= 6;
+    }
+
+    /**
+     * Determines if the given creature is a butterfly.
+     * @param creature A creature name.
+     * @return True if the given creature is a butterfly.
+     */
+    private boolean isCreatureButterfly(CreatureName creature) {
+        return creature.name().equals(CreatureName.BUTTERFLY.name());
+    }
+
+    /**
      * For this submission, just put the piece on the board. You
      * can assume that the hex (x, y) is empty. You do not have to do
      * any checking.
@@ -115,33 +157,52 @@ public class HexAroundFirstSubmission implements IHexAround1{
      */
     @Override
     public MoveResponse placeCreature(CreatureName creature, int x, int y) {
-        board.placeCreatureAt(creature, x, y);
+        // Player must place butterfly.
+        if(this.isTurnFourOrLater() && !this.isButterflyDown() && !this.isCreatureButterfly(creature))
+            return new MoveResponse(MOVE_ERROR, String.format("%s player must place their butterfly.",
+                    this.team ? "Blue" : "Red"));
 
-        // New for submission 2.
-        // Copy-pasted "Legal move".
+        if(this.isOccupied(x, y))
+            return new MoveResponse(MOVE_ERROR, String.format("(%d, %d) is already occupied.", x, y));
+
+        // TODO: CHECK IF NEIGHBORS CONTAIN ENEMY PIECE.
+        // NEED TO ADD TEAMS TO PIECES BEFORE CHECKING NEIGHBORS.
+
+        this.board.placeCreatureAt(creature, this.team, x, y);
+
+        if(this.isCreatureButterfly(creature)) {
+            if(this.team) {
+                this.blueButterflyDown = true;
+            }
+
+            else {
+                this.redButterflyDown = true;
+            }
+        }
+
+        this.moveCount += 1;
+        this.team = !this.team;
+
         return new MoveResponse(OK, "Legal move");
     }
 
     /**
-     * New for submission 2.
+     * todo
      */
     @Override
     public MoveResponse moveCreature(CreatureName creature, int fromX, int fromY, int toX, int toY) {
         if(!isLegalMove(creature, fromX, fromY, toX, toY))
-            // Copy-pasted "Colony is not connected, try again".
             return new MoveResponse(MOVE_ERROR, "Colony is not connected, try again");
 
-        this.board.removeCreature(fromX, fromY);
-        this.board.placeCreatureAt(creature, toX, toY);
-        // Copy-pasted "Legal move".
+        this.board.removeCreature(creature, this.team, fromX, fromY);
+        this.board.placeCreatureAt(creature, this.team, toX, toY);
+        this.moveCount += 1;
+        this.team = !this.team;
+
         return new MoveResponse(OK, "Legal move");
     }
 
-    // New for submission 2.
-
     /**
-     * New for submission 2.
-     *
      * Return true if the given move satisfies the following conditions:
      *   1) The move is within the piece's max distance.
      *   2) The colony will remain connected after the piece is moved.
@@ -152,13 +213,13 @@ public class HexAroundFirstSubmission implements IHexAround1{
         if(!canReach(fromX, fromY, toX, toY)) return false;
 
         // Move the piece and check that the colony is still connected.
-        this.board.removeCreature(fromX, fromY);
-        this.board.placeCreatureAt(creature, toX, toY);
+        this.board.removeCreature(creature, this.team, fromX, fromY);
+        this.board.placeCreatureAt(creature, this.team, toX, toY);
         boolean connected = this.board.isColonyConnected();
 
         // Move the piece back.
-        this.board.removeCreature(toX, toY);
-        this.board.placeCreatureAt(creature, fromX, fromY);
+        this.board.removeCreature(creature, this.team, toX, toY);
+        this.board.placeCreatureAt(creature, this.team, fromX, fromY);
 
         return connected;
     }

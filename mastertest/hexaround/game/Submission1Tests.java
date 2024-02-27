@@ -13,8 +13,8 @@ package hexaround.game;
 
 import hexaround.game.move.MoveResponse;
 import hexaround.game.move.MoveResult;
-import hexaround.game.rules.CreatureName;
-import hexaround.game.rules.CreatureProperty;
+import hexaround.game.rule.CreatureName;
+import hexaround.game.rule.CreatureProperty;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
@@ -23,8 +23,8 @@ import util.*;
 import java.io.*;
 import java.util.stream.*;
 
-import static hexaround.game.rules.CreatureName.*;
-import static hexaround.game.rules.CreatureProperty.*;
+import static hexaround.game.rule.CreatureName.*;
+import static hexaround.game.rule.CreatureProperty.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.*;
 

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.*;
 
 import java.io.*;
 
-import static hexaround.game.rules.CreatureName.*;
+import static hexaround.game.rule.CreatureName.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class Submission1Test {

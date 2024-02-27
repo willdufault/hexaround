@@ -21,15 +21,6 @@ import java.util.*;
  */
 public record HexCoordinate(int x, int y) {
     /**
-     * The only constructor allowed
-     *
-     * @param x: first axis value
-     * @param y: second axis value
-     */
-    public HexCoordinate {
-    }
-
-    /**
      * Factory method.
      *
      * @param x

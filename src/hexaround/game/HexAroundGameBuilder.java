@@ -24,7 +24,8 @@ import hexaround.game.board.*;
 import java.io.*;
 
 public class HexAroundGameBuilder {
-    public static IHexAround1 buildGameManager(String configurationFile) throws IOException {
+//    public static IHexAround1 buildGameManager(String configurationFile) throws IOException {
+    public static HexAroundFirstSubmission buildGameManager(String configurationFile) throws IOException {
         HexAroundConfigurationMaker configurationMaker =
             new HexAroundConfigurationMaker(configurationFile);
         GameConfiguration configuration = configurationMaker.makeConfiguration();

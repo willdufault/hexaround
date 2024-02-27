@@ -1,10 +1,5 @@
 package hexaround.game.board.piece;
 
-import java.util.LinkedList;
+import hexaround.game.rule.CreatureName;
 
-public class CreaturePiece {
-    private boolean intruding = false;
-    private LinkedList abilities = null;
-    private LinkedList attributes = null;
-
-}
+public record CreaturePiece(CreatureName creature, boolean team) {}
