@@ -49,8 +49,6 @@ public class HexAroundBoard {
     }
 
     /**
-     * New for submission 2.
-     *
      * Removes the creature at the given coordinate..
      */
     public void removeCreature(int x, int y) {
@@ -58,8 +56,6 @@ public class HexAroundBoard {
     }
 
     /**
-     * New for submission 2.
-     *
      * Return true if the colony is connected.
      */
     public boolean isColonyConnected() {
@@ -70,8 +66,6 @@ public class HexAroundBoard {
     }
 
     /**
-     * New for submission 2.
-     *
      * Recursively count all nodes directly connected to hex.
      */
     private int getClusterSize(HexCoordinate hex, HashSet<HexCoordinate> seen) {

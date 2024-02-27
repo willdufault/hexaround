@@ -28,7 +28,7 @@ import static hexaround.game.rules.CreatureProperty.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.*;
 
-public class Submission2Tests extends BaseTestMaster {
+public class Submission1Tests extends BaseTestMaster {
     private static boolean firstTest = true;
 
     private final int TEST_POINTS = 25;
@@ -47,7 +47,7 @@ public class Submission2Tests extends BaseTestMaster {
         }
     }
 
-    public Submission2Tests() {
+    public Submission1Tests() {
         if (firstTest) {
             testReporter.startNewTestGroup("Submission 1", TEST_POINTS);
         }

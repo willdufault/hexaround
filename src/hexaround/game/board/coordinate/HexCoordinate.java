@@ -19,22 +19,19 @@ import java.util.*;
  * currently only has a default constructor that takes the two
  * axis values (x, y).
  */
-public class HexCoordinate {
-    private final int x;
-    private final int y;
-
+public record HexCoordinate(int x, int y) {
     /**
      * The only constructor allowed
+     *
      * @param x: first axis value
      * @param y: second axis value
      */
-    public HexCoordinate(int x, int y) {
-        this.x = x;
-        this.y = y;
+    public HexCoordinate {
     }
 
     /**
      * Factory method.
+     *
      * @param x
      * @param y
      * @return the specified coordinate
@@ -46,7 +43,7 @@ public class HexCoordinate {
     /**
      * This algorithm here is described in (no longer available)
      * {@link http://keekerdc.com/2011/03/hexagon-grids-coordinate-systems-and-distance-calculations/}
-     *
+     * <p>
      * Other algorithms can be found in
      * {@link https://news.extly.com/2022-joomla-developer/developer-news/14312-everything-you-ever-wanted-to-know-about-hexagonal-grids-redblobgames-com.html}
      *
@@ -57,10 +54,10 @@ public class HexCoordinate {
         HexCoordinate other = otherCoordinate;
         int distance;
         final int z = -x - y;
-        final int otherz = -other.getX() - other.getY();
-        final int d1 = Math.abs(other.getX() - x);
-        final int d2 = Math.abs(other.getY() - y);
-        final int d3 = Math.abs(otherz-z);
+        final int otherz = -other.x() - other.y();
+        final int d1 = Math.abs(other.x() - x);
+        final int d2 = Math.abs(other.y() - y);
+        final int d3 = Math.abs(otherz - z);
         distance = Math.max(d1, d2);
         distance = Math.max(distance, d3);
         return distance;
@@ -73,8 +70,8 @@ public class HexCoordinate {
      */
     public boolean isLinear(HexCoordinate otherCoordinate) {
         HexCoordinate other = otherCoordinate;
-        return x == other.getX() || y == other.getY()
-            || (x+y) == (other.getX() + other.getY());
+        return x == other.x() || y == other.y()
+                || (x + y) == (other.x() + other.y());
     }
 
     /**
@@ -84,30 +81,21 @@ public class HexCoordinate {
      */
     public Collection<HexCoordinate> neighbors() {
         Collection<HexCoordinate> neighbors = new LinkedList<>();
-        neighbors.add(new HexCoordinate(x, y-1));
-        neighbors.add(new HexCoordinate(x+1, y-1));
-        neighbors.add(new HexCoordinate(x+1, y));
-        neighbors.add(new HexCoordinate(x, y+1));
-        neighbors.add(new HexCoordinate(x-1, y+1));
-        neighbors.add(new HexCoordinate(x-1, y));
+        neighbors.add(new HexCoordinate(x, y - 1));
+        neighbors.add(new HexCoordinate(x + 1, y - 1));
+        neighbors.add(new HexCoordinate(x + 1, y));
+        neighbors.add(new HexCoordinate(x, y + 1));
+        neighbors.add(new HexCoordinate(x - 1, y + 1));
+        neighbors.add(new HexCoordinate(x - 1, y));
         return neighbors;
-    }
-
-    /* Generated methods */
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
     }
 
     @Override
     public String toString() {
         return "HexCoordinate{" +
-            "x=" + x +
-            ", y=" + y +
-            '}';
+                "x=" + x +
+                ", y=" + y +
+                '}';
     }
 
     @Override
@@ -119,10 +107,4 @@ public class HexCoordinate {
         return y == that.y;
     }
 
-    @Override
-    public int hashCode() {
-        int result = x;
-        result = 31 * result + y;
-        return result;
-    }
 }
