@@ -1,8 +1,12 @@
 package hexaround.game;
 
 import hexaround.config.*;
+import hexaround.game.ability.AbilityQueen;
+import hexaround.game.ability.AbstractAbility;
+import hexaround.game.ability.IAbility;
 import hexaround.game.board.*;
 import hexaround.game.board.coordinate.*;
+import hexaround.game.board.piece.CreaturePiece;
 import hexaround.game.move.MoveResponse;
 import hexaround.game.rule.CreatureName;
 import hexaround.game.rule.CreatureProperty;
@@ -15,13 +19,11 @@ public class HexAroundFirstSubmission implements IHexAround1{
 
     private HexAroundBoard board = null;
     private Map<CreatureName, CreatureDefinition> creatures = null;
+    private Map<CreatureProperty, IAbility> abilityMap = null;
     // Boolean to keep track of which team's turn it is.
     private boolean team = true;
     // 2 moves = 1 turn. (One move from both players.)
     private int moveCount = 0;
-    // BLUE MOVES FIRST.
-    private boolean blueButterflyDown = false;
-    private boolean redButterflyDown = false;
 
     /**
      * This is the default constructor, and the only constructor
@@ -31,7 +33,13 @@ public class HexAroundFirstSubmission implements IHexAround1{
      * will be filled in by the builder.
      */
     public HexAroundFirstSubmission() {
-        // Nothing to do
+        this.initializeAbilityMap();
+    }
+
+    public void initializeAbilityMap() {
+        this.abilityMap = new HashMap<>();
+        this.abilityMap.put(CreatureProperty.QUEEN, new AbilityQueen());
+        // todo: add other movement abilities
     }
 
     public boolean getTeam() {
@@ -79,6 +87,25 @@ public class HexAroundFirstSubmission implements IHexAround1{
     }
 
     /**
+     * Get the movement ability of the given creature.
+     * @param creature A creature name.
+     * @return The CreatureProperty (movement ability) of this creature.
+     */
+    public CreatureProperty getAbility(CreatureName creature) {
+        for(CreatureProperty property : this.creatures.get(creature).properties()) {
+            if(this.abilityMap.containsKey(property)) {
+                return property;
+            }
+        }
+
+        return null;
+    }
+
+    public boolean creatureHasProperty(CreatureName creature, CreatureProperty property) {
+        return this.creatures.get(creature).properties().contains(property);
+    }
+
+    /**
      * Given the x and y-coordinate of a hex, determine if there is a
      * piece on that hex on the board.
      * @param x
@@ -87,7 +114,7 @@ public class HexAroundFirstSubmission implements IHexAround1{
      */
     @Override
     public boolean isOccupied(int x, int y) {
-        return board.isCreatureAt(x,y );
+        return board.isOccupied(x, y);
     }
 
     /**
@@ -123,18 +150,9 @@ public class HexAroundFirstSubmission implements IHexAround1{
      * Determines if the current team's butterfly is down.
      * @return True if the butterfly is down.
      */
-    private boolean isButterflyDown() {
+    private boolean isButterflyDown(boolean team) {
         // BLUE MOVES FIRST.
-        return this.team ? this.blueButterflyDown : this.redButterflyDown;
-    }
-
-    /**
-     * Determines if it is turn four or later.
-     * @return True if it is turn four or later.
-     */
-    private boolean isTurnFourOrLater() {
-        // 1 turn = 2 moves.
-        return this.moveCount >= 6;
+        return this.board.getButterflyTile(team) != null;
     }
 
     /**
@@ -150,35 +168,30 @@ public class HexAroundFirstSubmission implements IHexAround1{
      * For this submission, just put the piece on the board. You
      * can assume that the hex (x, y) is empty. You do not have to do
      * any checking.
-     * @param creature
-     * @param x
-     * @param y
+     * @param creature A creature name.
+     * @param x The x coordinate.
+     * @param y The y coordinate.
      * @return a response, or null. It is not going to be checked.
      */
     @Override
     public MoveResponse placeCreature(CreatureName creature, int x, int y) {
-        // Player must place butterfly.
-        if(this.isTurnFourOrLater() && !this.isButterflyDown() && !this.isCreatureButterfly(creature))
-            return new MoveResponse(MOVE_ERROR, String.format("%s player must place their butterfly.",
-                    this.team ? "Blue" : "Red"));
+        if(this.isOccupied(x, y)) {
+            return new MoveResponse(MOVE_ERROR, "Tile is already occupied.");
+        }
 
-        if(this.isOccupied(x, y))
-            return new MoveResponse(MOVE_ERROR, String.format("(%d, %d) is already occupied.", x, y));
+        if(this.moveCount >= 1 && !this.board.hasOccupiedNeighbor(x, y)) {
+            return new MoveResponse(MOVE_ERROR, "The colony must remain connected.");
+        }
 
-        // TODO: CHECK IF NEIGHBORS CONTAIN ENEMY PIECE.
-        // NEED TO ADD TEAMS TO PIECES BEFORE CHECKING NEIGHBORS.
+        if(this.moveCount >= 2 && this.board.neighborsContainTeam(x, y, !this.team)) {
+            return new MoveResponse(MOVE_ERROR, "Cannot place a piece next to an enemy piece.");
+        }
+
+        if(this.moveCount >= 6 && !this.isButterflyDown(this.team) && !this.isCreatureButterfly(creature)) {
+            return new MoveResponse(MOVE_ERROR, "Player must place their butterfly.");
+        }
 
         this.board.placeCreatureAt(creature, this.team, x, y);
-
-        if(this.isCreatureButterfly(creature)) {
-            if(this.team) {
-                this.blueButterflyDown = true;
-            }
-
-            else {
-                this.redButterflyDown = true;
-            }
-        }
 
         this.moveCount += 1;
         this.team = !this.team;
@@ -187,12 +200,27 @@ public class HexAroundFirstSubmission implements IHexAround1{
     }
 
     /**
-     * todo
+     * Attempt to move a piece from (fromX, fromY) to (toX, toY).
+     * @param creature A creature name.
+     * @param fromX The source x coordinate.
+     * @param fromY The source y coordinate.
+     * @param toX The destination x coordinate.
+     * @param toY The destination y coordinate.
+     * @return A MoveResponse with the status and message of the attempted move.
      */
     @Override
     public MoveResponse moveCreature(CreatureName creature, int fromX, int fromY, int toX, int toY) {
-        if(!isLegalMove(creature, fromX, fromY, toX, toY))
-            return new MoveResponse(MOVE_ERROR, "Colony is not connected, try again");
+        // todo: check that the given creature and team exists on this tile.
+        if(!this.board.getCreaturesAt(fromX, fromY).contains(new CreaturePiece(creature, this.team))) {
+            return new MoveResponse(MOVE_ERROR, "There is no matching creature piece to move on that tile.");
+        }
+
+        // todo: this is always queen
+        if(!this.abilityMap.get(CreatureProperty.QUEEN).isLegalMove(this.board, creature, this.team,
+                this.creatureHasProperty(creature, CreatureProperty.INTRUDING), fromX, fromY, toX, toY)) {
+            // todo: replace this with a more descriptive message
+            return new MoveResponse(MOVE_ERROR, "Illegal move");
+        }
 
         this.board.removeCreature(creature, this.team, fromX, fromY);
         this.board.placeCreatureAt(creature, this.team, toX, toY);
@@ -208,9 +236,9 @@ public class HexAroundFirstSubmission implements IHexAround1{
      *   2) The colony will remain connected after the piece is moved.
      */
     private boolean isLegalMove(CreatureName creature, int fromX, int fromY, int toX, int toY) {
-        if(!board.isCreatureAt(fromX, fromY)) return false;
-
-        if(!canReach(fromX, fromY, toX, toY)) return false;
+        if(!board.isCreatureAt(fromX, fromY) || !canReach(fromX, fromY, toX, toY)) {
+            return false;
+        }
 
         // Move the piece and check that the colony is still connected.
         this.board.removeCreature(creature, this.team, fromX, fromY);

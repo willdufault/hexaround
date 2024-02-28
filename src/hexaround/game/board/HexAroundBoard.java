@@ -50,30 +50,93 @@ public class HexAroundBoard {
         return occupiedHexes.get(makeCoordinate(x, y)).get(0).creature();
     }
 
+    public HexCoordinate getButterflyTile(boolean team) {
+        return team ? this.blueButterfly : this.redButterfly;
+    }
+
+    /**
+     *
+     * @param x
+     * @param y
+     * @return The list of creatures at the given position.
+     */
+    public LinkedList<CreaturePiece> getCreaturesAt(int x, int y) {
+        HexCoordinate hex = makeCoordinate(x, y);
+
+        return this.occupiedHexes.containsKey(hex) ? new LinkedList<>(this.occupiedHexes.get(hex)) : null;
+    }
+
+    /**
+     *
+     * @param x
+     * @param y
+     * @return
+     */
     public boolean isCreatureAt(int x, int y) {
         return occupiedHexes.containsKey(makeCoordinate(x, y));
     }
 
     /**
-     * Removes the creature at the given coordinate.
+     * Determine if a given coordinate has at least one piece.
+     * @param x The x coordinate.
+     * @param y The y coordinate.
+     * @return True if the given coordinate is occupied.
      */
-    public void removeCreature(CreatureName creature, boolean team, int x, int y) {
+    public boolean isOccupied(int x, int y) {
         HexCoordinate hex = makeCoordinate(x, y);
-        LinkedList<CreaturePiece> pieces = this.occupiedHexes.get(hex);
 
-        if(pieces.size() == 1) {
-            this.occupiedHexes.remove(hex);
-            return;
-        }
+        return this.occupiedHexes.containsKey(hex) && this.occupiedHexes.get(hex).size() > 0;
+    }
 
-        // Remove the first matching instance.
-        for(CreaturePiece cp : pieces) {
-            if (cp.creature().name().equals(creature.name()) && cp.team() == team) {
-                pieces.remove(cp);
-                System.out.println("removing" + cp);
-                break;
+    /**
+     * Determine if a given coordinate has two creatures on it.
+     * @param x The x coordinate.
+     * @param y The y coordinate.
+     * @return True if the given coordinate is full.
+     */
+    public boolean isFull(int x, int y) {
+        HexCoordinate hex = makeCoordinate(x, y);
+
+        return this.occupiedHexes.containsKey(hex) && this.occupiedHexes.get(hex).size() == 2;
+    }
+
+    /**
+     * Determine if a given coordinate has at least one occupied neighbor.
+     * @param x The x coordinate.
+     * @param y The y coordinate.
+     * @return True if there is at least one occupied neighbor.
+     */
+    public boolean hasOccupiedNeighbor(int x, int y) {
+        for(HexCoordinate neighbor : makeCoordinate(x, y).neighbors()) {
+            if(this.isOccupied(neighbor.x(), neighbor.y())) {
+                return true;
             }
         }
+
+        return false;
+    }
+
+    /**
+     *
+     * @param x
+     * @param y
+     * @param team
+     * @return True if any neighboring tiles of (x, y) contain a piece on the given team.
+     */
+    public boolean neighborsContainTeam(int x, int y, boolean team) {
+        for(HexCoordinate neighbor : makeCoordinate(x, y).neighbors()) {
+            if(!this.occupiedHexes.containsKey(neighbor)) {
+                continue;
+            }
+
+            for(CreaturePiece piece : this.occupiedHexes.get(neighbor)) {
+                if(piece.team() == team) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -88,8 +151,6 @@ public class HexAroundBoard {
 
     /**
      * Recursively count all nodes directly connected to hex.
-     *
-     * NOTE: Could replace with union find.
      */
     private int getClusterSize(HexCoordinate hex, HashSet<HexCoordinate> seen) {
         if(!this.occupiedHexes.containsKey(hex)) return 0;
@@ -114,6 +175,8 @@ public class HexAroundBoard {
      * @return true if okay, false if there is a piece on the location
      */
     public void placeCreatureAt(CreatureName creature, boolean team, int x, int y) {
+
+        //todo: need to pass in an index to place the creature at that position in the list
         HexCoordinate hex = makeCoordinate(x, y);
 
         if(!this.occupiedHexes.containsKey(hex))
@@ -127,6 +190,30 @@ public class HexAroundBoard {
 
             else
                 this.redButterfly = hex;
+        }
+    }
+
+    /**
+     * Removes the creature at the given coordinate.
+     */
+    public void removeCreature(CreatureName creature, boolean team, int x, int y) {
+
+        // todo: need to return the index the creature was at so i can place it back after
+        HexCoordinate hex = makeCoordinate(x, y);
+        LinkedList<CreaturePiece> pieces = this.occupiedHexes.get(hex);
+
+        if(pieces.size() == 1) {
+            this.occupiedHexes.remove(hex);
+            return;
+        }
+
+        // Remove the first matching instance.
+        for(CreaturePiece cp : pieces) {
+            if (cp.creature().name().equals(creature.name()) && cp.team() == team) {
+                pieces.remove(cp);
+                System.out.println("removing" + cp);
+                break;
+            }
         }
     }
 }
