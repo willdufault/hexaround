@@ -9,7 +9,6 @@ import java.util.HashMap;
 import static hexaround.game.board.coordinate.HexCoordinate.makeCoordinate;
 
 public class AbilityWalking extends AbstractAbility implements IAbility {
-
     /**
      * Determine if the move from (fromX, fromY) to (toX, toY) is legal.
      *
@@ -24,7 +23,6 @@ public class AbilityWalking extends AbstractAbility implements IAbility {
      * @param distance  The max distance this piece can move.
      * @return True if the move is legal.
      */
-    @Override
     public boolean isLegalMove(HexAroundBoard board, CreatureName creature, boolean team, boolean intruding,
                                int fromX, int fromY, int toX, int toY, int distance) {
         if(board.isFull(toX, toY)) {
@@ -42,6 +40,20 @@ public class AbilityWalking extends AbstractAbility implements IAbility {
         return this.pathExists(board, creature, team, intruding, fromX, fromY, toX, toY, distance, new HashMap<>());
     }
 
+    /**
+     * Recursively determine if there is a path from (x, y) to (toX, toY).
+     * @param board The hex board.
+     * @param creature A creature name.
+     * @param team The creature's team.
+     * @param intruding Whether the creature has the intruding attribute.
+     * @param x The current x coordinate.
+     * @param y The current y coordinate.
+     * @param toX The destination x coordinate.
+     * @param toY The destination y coordinate.
+     * @param remaining The number of remaining moves.
+     * @param record A HashMap storing the highest number of moves remaining for each visited tile.
+     * @return True if a path exists.
+     */
     public boolean pathExists(HexAroundBoard board, CreatureName creature, boolean team, boolean intruding,
                        int x, int y, int toX, int toY, int remaining, HashMap<HexCoordinate, Integer> record) {
         if(remaining < 0) {

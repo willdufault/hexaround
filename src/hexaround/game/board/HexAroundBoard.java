@@ -211,9 +211,24 @@ public class HexAroundBoard {
         for(CreaturePiece cp : pieces) {
             if (cp.creature().name().equals(creature.name()) && cp.team() == team) {
                 pieces.remove(cp);
-                System.out.println("removing" + cp);
                 break;
             }
         }
+    }
+
+    /**
+     * Determines if a given tile is surrounded by pieces.
+     * @param x The x coordinate.
+     * @param y The y coordinate.
+     * @return True if the tile is surrounded.
+     */
+    public boolean isSurrounded(int x, int y) {
+        for(HexCoordinate neighbor : makeCoordinate(x, y).neighbors()) {
+            if(!this.isOccupied(neighbor.x(), neighbor.y())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

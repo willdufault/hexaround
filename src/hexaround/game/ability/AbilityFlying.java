@@ -1,41 +1,48 @@
 package hexaround.game.ability;
 
 import hexaround.game.board.HexAroundBoard;
+import hexaround.game.board.coordinate.HexCoordinate;
 import hexaround.game.rule.CreatureName;
+
+import java.util.HashMap;
 
 import static hexaround.game.board.coordinate.HexCoordinate.makeCoordinate;
 
-public class AbilityQueen extends AbstractAbility implements IAbility {
+public class AbilityFlying extends AbstractAbility implements IAbility {
     /**
      * Determine if the move from (fromX, fromY) to (toX, toY) is legal.
-     * @param board The hex board.
-     * @param creature The name of the creature.
-     * @param team The team the creature is on.
+     *
+     * @param board     The hex board.
+     * @param creature  The name of the creature.
+     * @param team      The team the creature is on.
      * @param intruding Whether the creature at (fromX, fromY) has the intruding attribute.
-     * @param fromX The source x coordinate.
-     * @param fromY The source y coordinate.
-     * @param toX The destination x coordinate.
+     * @param fromX     The source x coordinate.
+     * @param fromY     The source y coordinate.
+     * @param toX       The destination x coordinate.
+     * @param toY       The destination y coordinate.
+     * @param distance  The max distance this piece can move.
      * @return True if the move is legal.
      */
+    @Override
     public boolean isLegalMove(HexAroundBoard board, CreatureName creature, boolean team, boolean intruding,
-                               int fromX, int fromY, int toX, int toY, int dids) {
-
-       // todo: queen is the property that ends the game when surrounded, this is just walking 1. do walking and replace
-       // instances of queen with walking 1 in the game manager
-
-
+                               int fromX, int fromY, int toX, int toY, int distance) {
         if(board.isFull(toX, toY)) {
             return false;
         }
 
-        if(makeCoordinate(fromX, fromY).distanceTo(makeCoordinate(toX, toY)) != 1) {
+        if(board.isOccupied(toX, toY) && !intruding) {
             return false;
         }
 
-        if(!intruding && !this.canDrag(board, fromX, fromY, toX, toY)) {
+        if(makeCoordinate(fromX, fromY).distanceTo(makeCoordinate(toX, toY)) > distance) {
             return false;
         }
 
+        if(board.isSurrounded(fromX, fromY)) {
+            return false;
+        }
+
+        // Check for connectedness.
         board.removeCreature(creature, team, fromX, fromY);
         board.placeCreatureAt(creature, team, toX, toY);
 

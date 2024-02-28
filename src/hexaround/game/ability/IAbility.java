@@ -1,7 +1,10 @@
 package hexaround.game.ability;
 
 import hexaround.game.board.HexAroundBoard;
+import hexaround.game.board.coordinate.HexCoordinate;
 import hexaround.game.rule.CreatureName;
+
+import java.util.HashMap;
 
 public interface IAbility {
     /**
@@ -18,6 +21,6 @@ public interface IAbility {
      * @param distance The max distance this piece can move.
      * @return True if the move is legal.
      */
-    public boolean isLegalMove(HexAroundBoard board, CreatureName creature, boolean team, boolean intruding,
+    boolean isLegalMove(HexAroundBoard board, CreatureName creature, boolean team, boolean intruding,
                                int fromX, int fromY, int toX, int toY, int distance);
 }

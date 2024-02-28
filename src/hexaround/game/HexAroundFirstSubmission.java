@@ -1,9 +1,7 @@
 package hexaround.game;
 
 import hexaround.config.*;
-import hexaround.game.ability.AbilityQueen;
-import hexaround.game.ability.AbstractAbility;
-import hexaround.game.ability.IAbility;
+import hexaround.game.ability.*;
 import hexaround.game.board.*;
 import hexaround.game.board.coordinate.*;
 import hexaround.game.board.piece.CreaturePiece;
@@ -38,8 +36,10 @@ public class HexAroundFirstSubmission implements IHexAround1{
 
     public void initializeAbilityMap() {
         this.abilityMap = new HashMap<>();
-        this.abilityMap.put(CreatureProperty.QUEEN, new AbilityQueen());
-        // todo: add other movement abilities
+        this.abilityMap.put(CreatureProperty.WALKING, new AbilityWalking());
+        this.abilityMap.put(CreatureProperty.RUNNING, new AbilityRunning());
+        this.abilityMap.put(CreatureProperty.JUMPING, new AbilityJumping());
+        this.abilityMap.put(CreatureProperty.FLYING, new AbilityFlying());
     }
 
     public boolean getTeam() {
@@ -101,6 +101,12 @@ public class HexAroundFirstSubmission implements IHexAround1{
         return null;
     }
 
+    /**
+     *
+     * @param creature
+     * @param property
+     * @return
+     */
     public boolean creatureHasProperty(CreatureName creature, CreatureProperty property) {
         return this.creatures.get(creature).properties().contains(property);
     }
@@ -210,14 +216,13 @@ public class HexAroundFirstSubmission implements IHexAround1{
      */
     @Override
     public MoveResponse moveCreature(CreatureName creature, int fromX, int fromY, int toX, int toY) {
-        // todo: check that the given creature and team exists on this tile.
         if(!this.board.getCreaturesAt(fromX, fromY).contains(new CreaturePiece(creature, this.team))) {
             return new MoveResponse(MOVE_ERROR, "There is no matching creature piece to move on that tile.");
         }
 
-        // todo: this is always queen
-        if(!this.abilityMap.get(CreatureProperty.QUEEN).isLegalMove(this.board, creature, this.team,
-                this.creatureHasProperty(creature, CreatureProperty.INTRUDING), fromX, fromY, toX, toY)) {
+        if(!this.abilityMap.get(this.getAbility(creature)).isLegalMove(this.board, creature, this.team,
+                this.creatureHasProperty(creature, CreatureProperty.INTRUDING), fromX, fromY, toX, toY,
+                this.creatures.get(creature).maxDistance())) {
             // todo: replace this with a more descriptive message
             return new MoveResponse(MOVE_ERROR, "Illegal move");
         }
