@@ -25,15 +25,23 @@ public class AbilityWalking extends AbstractAbility implements IAbility {
      */
     public boolean isLegalMove(HexAroundBoard board, CreatureName creature, boolean team, boolean intruding,
                                int fromX, int fromY, int toX, int toY, int distance) {
+        if(fromX == toX && fromY == toY) {
+            System.out.println("Not allowed to skip turns.");
+            return false;
+        }
+
         if(board.isFull(toX, toY)) {
+            System.out.println("That tile is full.");
             return false;
         }
 
         if(board.isOccupied(toX, toY) && !intruding) {
+            System.out.println("That tile is occupied and this piece is not intruding.");
             return false;
         }
 
         if(makeCoordinate(fromX, fromY).distanceTo(makeCoordinate(toX, toY)) > distance) {
+            System.out.println("That tile too far.");
             return false;
         }
 
@@ -56,16 +64,16 @@ public class AbilityWalking extends AbstractAbility implements IAbility {
      */
     public boolean pathExists(HexAroundBoard board, CreatureName creature, boolean team, boolean intruding,
                        int x, int y, int toX, int toY, int remaining, HashMap<HexCoordinate, Integer> record) {
-        if(remaining < 0) {
-            return false;
-        }
-
         if(!board.isColonyConnected()) {
             return false;
         }
 
         if(x == toX && y == toY) {
             return true;
+        }
+
+        if(remaining == 0) {
+            return false;
         }
 
         HexCoordinate hex = makeCoordinate(x, y);
@@ -88,11 +96,11 @@ public class AbilityWalking extends AbstractAbility implements IAbility {
 
             // todo: need to place creature back in the same position they were in originally
             // todo: MATTERS IF CREATURE ON TOP IS INTRUDING, NEED TO PUT THEM BACK ON TOP
-            // todo: if top creature is intruding, can't move anyway. need to check for this.
             board.removeCreature(creature, team, x, y);
             board.placeCreatureAt(creature, team, nextX, nextY);
 
-            boolean result = this.pathExists(board, creature, team, intruding, nextX, nextY, toX, toY, remaining - 1, record);
+            boolean result = this.pathExists(board, creature, team, intruding, nextX, nextY, toX, toY,
+                    remaining - 1, record);
 
             board.removeCreature(creature, team, nextX, nextY);
             board.placeCreatureAt(creature, team, x, y);

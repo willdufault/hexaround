@@ -2,7 +2,6 @@ package hexaround;
 
 import hexaround.game.*;
 import hexaround.game.move.MoveResponse;
-import hexaround.game.move.MoveResult;
 import hexaround.game.rule.CreatureProperty;
 import org.junit.jupiter.api.*;
 
@@ -17,6 +16,7 @@ public class FinalTest {
     String hgcTest = "testConfigurations/TestConfiguration.hgc";
     HexAroundFirstSubmission game1 = null;
     MoveResponse legalMove = new MoveResponse(OK, "Legal move");
+    MoveResponse illegalMove = new MoveResponse(MOVE_ERROR, "Illegal move");
 
     // TODO: TEST WITH THIS INTERFACE B/C HE MIGHT TEST WITH THIS.
     // IHexAround1 game1 = null;
@@ -168,8 +168,7 @@ public class FinalTest {
         assertEquals(new MoveResponse(MOVE_ERROR, "Player must place their butterfly."),
                 this.game1.placeCreature(CRAB, -3, 0));
 
-        assertEquals(legalMove,
-                this.game1.placeCreature(BUTTERFLY, -3, 0));
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, -3, 0));
 
     }
 
@@ -198,8 +197,7 @@ public class FinalTest {
         assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 0, 0));
         assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
 
-        assertEquals(new MoveResponse(MOVE_ERROR, "Illegal move"),
-                this.game1.moveCreature(BUTTERFLY, 0, 0, 2, 0));
+        assertEquals(illegalMove, this.game1.moveCreature(BUTTERFLY, 0, 0, 2, 0));
     }
 
     @Test
@@ -207,8 +205,7 @@ public class FinalTest {
         assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 0, 0));
         assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
 
-        assertEquals(new MoveResponse(MOVE_ERROR, "Illegal move"),
-                this.game1.moveCreature(BUTTERFLY, 0, 0, 1, 0));
+        assertEquals(illegalMove, this.game1.moveCreature(BUTTERFLY, 0, 0, 1, 0));
     }
 
     @Test
@@ -222,8 +219,7 @@ public class FinalTest {
         assertEquals(legalMove, this.game1.moveCreature(TURTLE, 0, -1, 1, -1));
         assertEquals(legalMove, this.game1.moveCreature(TURTLE, 2, 0, 1, -1));
 
-        assertEquals(new MoveResponse(MOVE_ERROR, "Illegal move"),
-                this.game1.moveCreature(BUTTERFLY, 0, 0, 1, -1));
+        assertEquals(illegalMove, this.game1.moveCreature(BUTTERFLY, 0, 0, 1, -1));
     }
 
     @Test
@@ -260,8 +256,7 @@ public class FinalTest {
         assertEquals(legalMove, this.game1.placeCreature(CRAB, -1, -1));
         assertEquals(legalMove, this.game1.moveCreature(CRAB, 2, -1, 1, -1));
 
-        assertEquals(new MoveResponse(MOVE_ERROR, "Illegal move"),
-                this.game1.moveCreature(BUTTERFLY, 0, 0, -1, 1));
+        assertEquals(illegalMove, this.game1.moveCreature(BUTTERFLY, 0, 0, -1, 1));
     }
 
     @Test
@@ -269,7 +264,7 @@ public class FinalTest {
         assertEquals(legalMove, this.game1.placeCreature(CRAB, 0, 0));
         assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 0));
 
-        assertEquals(new MoveResponse(MOVE_ERROR, "Illegal move"),
+        assertEquals(illegalMove,
                 this.game1.moveCreature(CRAB, 0, 0, 0, 2));
     }
 
@@ -281,20 +276,18 @@ public class FinalTest {
         assertEquals(legalMove, this.game1.placeCreature(CRAB, -1, 0));
         assertEquals(legalMove, this.game1.placeCreature(CRAB, 2, 0));
 
-        assertEquals(new MoveResponse(MOVE_ERROR, "Illegal move"),
-                this.game1.moveCreature(CRAB, -1, 0, 3, -1));
+        assertEquals(illegalMove, this.game1.moveCreature(CRAB, -1, 0, 3, -1));
     }
 
     @Test
-    void testMoveWalkingOnTopNoIntruding() {
+    void testMoveWalkingOnTopNotIntruding() {
         assertEquals(legalMove, this.game1.placeCreature(CRAB, 0, 0));
         assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 0));
 
         assertEquals(legalMove, this.game1.placeCreature(CRAB, -1, 0));
         assertEquals(legalMove, this.game1.placeCreature(CRAB, 2, 0));
 
-        assertEquals(new MoveResponse(MOVE_ERROR, "Illegal move"),
-                this.game1.moveCreature(CRAB, -1, 0, 1, 0));
+        assertEquals(illegalMove, this.game1.moveCreature(CRAB, -1, 0, 1, 0));
     }
 
     @Test
@@ -321,7 +314,7 @@ public class FinalTest {
     }
 
     @Test
-    void testWalkingMiddleNotConnected() {
+    void testMoveWalkingMiddleNotConnected() {
         assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 0, 0));
         assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
 
@@ -334,16 +327,422 @@ public class FinalTest {
         assertEquals(legalMove, this.game1.placeCreature(CRAB, 0, -2));
         assertEquals(legalMove, this.game1.placeCreature(GRASSHOPPER, 4, -2));
 
-        assertEquals(new MoveResponse(MOVE_ERROR, "Illegal move"),
-                this.game1.moveCreature(CRAB, 0, -2, 3, -2));
+        assertEquals(illegalMove, this.game1.moveCreature(CRAB, 0, -2, 3, -2));
     }
 
     @Test
-    void testWalkingInPlaceFail() {
+    void testMoveWalkingInPlaceFail() {
         assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 0, 0));
         assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
 
-        assertEquals(new MoveResponse(MOVE_ERROR, "Illegal move"),
-                this.game1.moveCreature(BUTTERFLY, 0, 0, 0, 0));
+        assertEquals(illegalMove, this.game1.moveCreature(BUTTERFLY, 0, 0, 0, 0));
+    }
+
+    @Test
+    void testMoveWalkingInPlaceIntrudingFail() {
+        assertEquals(legalMove, this.game1.placeCreature(TURTLE, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
+
+        assertEquals(illegalMove, this.game1.moveCreature(TURTLE, 0, 0, 0, 0));
+    }
+
+    @Test
+    void testMoveWalkingOnTopIntrudingMiddle() {
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(TURTLE, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 2, -1));
+
+        assertEquals(legalMove, this.game1.moveCreature(TURTLE, -1, 0, 2, 0));
+    }
+
+    @Test
+    void testMoveWalkingOnFullIntrudingMiddle() {
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(TURTLE, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(TURTLE, 2, -1));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, -1, 1));
+        assertEquals(legalMove, this.game1.moveCreature(TURTLE, 2, -1, 1,0));
+
+        assertEquals(legalMove, this.game1.moveCreature(TURTLE, -1, 0, 2, 0));
+    }
+
+    @Test
+    void testMoveFlyingInPlaceFail() {
+        assertEquals(legalMove, this.game1.placeCreature(HUMMINGBIRD, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 0));
+
+        assertEquals(illegalMove, this.game1.moveCreature(HUMMINGBIRD, 0, 0, 0, 0));
+    }
+
+    @Test
+    void testMoveFlyingInPlaceIntrudingFail() {
+        assertEquals(legalMove, this.game1.placeCreature(DOVE, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 0));
+
+        assertEquals(illegalMove, this.game1.moveCreature(DOVE, 0, 0, 0, 0));
+    }
+
+    @Test
+    void testMoveFlyingClose() {
+        assertEquals(legalMove, this.game1.placeCreature(HUMMINGBIRD, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 0));
+
+        assertEquals(legalMove, this.game1.moveCreature(HUMMINGBIRD, 0, 0, 2, 0));
+    }
+
+    @Test
+    void testMoveFlyingFar() {
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(HUMMINGBIRD, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 2, 0));
+
+        assertEquals(illegalMove, this.game1.moveCreature(HUMMINGBIRD, -1, 0, 3, 0));
+    }
+
+    @Test
+    void testMoveFlyingNotConnected() {
+        assertEquals(legalMove, this.game1.placeCreature(HUMMINGBIRD, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 0));
+
+        assertEquals(illegalMove, this.game1.moveCreature(HUMMINGBIRD, 0, 0, -1, 0));
+    }
+
+    @Test
+    void testMoveFlyingOverFull() {
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(HUMMINGBIRD, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(TURTLE, 2, -1));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, -1, 1));
+        assertEquals(legalMove, this.game1.moveCreature(TURTLE, 2, -1, 1,0));
+
+        assertEquals(legalMove, this.game1.moveCreature(HUMMINGBIRD, -1, 0, 2, 0));
+    }
+
+    @Test
+    void testMoveFlyingLandOnCreatureNoIntruding() {
+        assertEquals(legalMove, this.game1.placeCreature(HUMMINGBIRD, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 0, 1));
+
+        assertEquals(illegalMove, this.game1.moveCreature(HUMMINGBIRD, 0, 0, 0, 1));
+    }
+
+    @Test
+    void testMoveFlyingLandOnCreatureIntruding() {
+        assertEquals(legalMove, this.game1.placeCreature(DOVE, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 0, 1));
+
+        assertEquals(legalMove, this.game1.moveCreature(DOVE, 0, 0, 0, 1));
+    }
+
+    @Test
+    void testMoveFlyingDraggable() {
+        assertEquals(legalMove, this.game1.placeCreature(HUMMINGBIRD, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 1));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 0, -1));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 2, -1));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, -1, -1));
+        assertEquals(legalMove, this.game1.moveCreature(CRAB, 2, -1, 1, -1));
+
+        assertEquals(legalMove, this.game1.moveCreature(HUMMINGBIRD, 0, 0, -1, 1));
+    }
+
+    @Test
+    void testMoveFlyingNotDraggable() {
+        assertEquals(legalMove, this.game1.placeCreature(HUMMINGBIRD, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 1));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 0, -1));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 2, -1));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, -2, 0));
+        assertEquals(legalMove, this.game1.moveCreature(CRAB, 1, 1, 0, 1));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, -1, -1));
+        assertEquals(legalMove, this.game1.moveCreature(CRAB, 2, -1, 1, -1));
+
+        assertEquals(legalMove, this.game1.moveCreature(HUMMINGBIRD, 0, 0, -1, 1));
+    }
+
+    @Test
+    void testMoveFlyingSurrounded() {
+        assertEquals(legalMove, this.game1.placeCreature(HUMMINGBIRD, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 1));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 0, -1));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 2, -1));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, -1, 1));
+        assertEquals(legalMove, this.game1.moveCreature(CRAB, 2, -1, 1, -1));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, -2, 0));
+        assertEquals(legalMove, this.game1.moveCreature(CRAB, 1, 1, 0, 1));
+
+        assertEquals(illegalMove, this.game1.moveCreature(HUMMINGBIRD, 0, 0, -1, 2));
+    }
+
+    @Test
+    void testMoveRunningInPlaceFail() {
+        assertEquals(legalMove, this.game1.placeCreature(SPIDER, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 0));
+
+        assertEquals(illegalMove, this.game1.moveCreature(SPIDER, 0, 0, 0, 0));
+    }
+
+    @Test
+    void testMoveFlyingRunningIntrudingFail() {
+        assertEquals(legalMove, this.game1.placeCreature(SPIDER, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 0));
+
+        assertEquals(illegalMove, this.game1.moveCreature(SPIDER, 0, 0, 0, 0));
+    }
+
+    @Test
+    void testMoveRunningClose() {
+        assertEquals(legalMove, this.game1.placeCreature(HORSE, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 0));
+
+        assertEquals(illegalMove, this.game1.moveCreature(HORSE, 0, 0, 1, -1));
+    }
+
+    @Test
+    void testMoveRunningFar() {
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(HORSE, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 2, 0));
+
+        assertEquals(illegalMove, this.game1.moveCreature(HORSE, -1, 0, 3, -1));
+    }
+
+    @Test
+    void testMoveRunningExact() {
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(HORSE, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 2, 0));
+
+        assertEquals(legalMove, this.game1.moveCreature(HORSE, -1, 0, 1, 1));
+    }
+
+    @Test
+    void testMoveRunningCloseIntruding() {
+        assertEquals(legalMove, this.game1.placeCreature(SPIDER, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 0));
+
+        assertEquals(illegalMove, this.game1.moveCreature(SPIDER, 0, 0, 1, -1));
+    }
+
+    @Test
+    void testMoveRunningFarIntruding() {
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(SPIDER, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 2, 0));
+
+        assertEquals(illegalMove, this.game1.moveCreature(SPIDER, -1, 0, 3, -1));
+    }
+
+    @Test
+    void testMoveRunningExactIntruding1() {
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 2, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(SPIDER, -2, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 3, -1));
+
+        assertEquals(legalMove, this.game1.moveCreature(SPIDER, -2, 0, 3, 0));
+    }
+
+    @Test
+    void testMoveRunningExactIntrudingOccupied() {
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 2, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(SPIDER, -2, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 3, 0));
+
+        assertEquals(legalMove, this.game1.moveCreature(SPIDER, -2, 0, 3, 0));
+    }
+
+    @Test
+    void testMoveRunningExactMiddleNotConnected() {
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(GRASSHOPPER, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(GRASSHOPPER, 2, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(GRASSHOPPER, -1, -1));
+        assertEquals(legalMove, this.game1.placeCreature(GRASSHOPPER, 3, -1));
+
+        assertEquals(legalMove, this.game1.placeCreature(HORSE, 0, -2));
+        assertEquals(legalMove, this.game1.placeCreature(GRASSHOPPER, 4, -2));
+
+        assertEquals(illegalMove, this.game1.moveCreature(HORSE, 0, -2, 3, -2));
+    }
+
+    @Test
+    void testMoveRunningExactOnFullIntrudingMiddle() {
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 2, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(SPIDER, -2, 0));
+        assertEquals(legalMove, this.game1.placeCreature(TURTLE, 2, -1));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 0, -1));
+        assertEquals(legalMove, this.game1.moveCreature(TURTLE, 2, -1, 2, 0));
+
+        assertEquals(legalMove, this.game1.moveCreature(SPIDER, -2, 0, 3, 0));
+    }
+
+    @Test
+    void testMoveJumpingInPlaceFail() {
+        assertEquals(legalMove, this.game1.placeCreature(GRASSHOPPER, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 0));
+
+        assertEquals(illegalMove, this.game1.moveCreature(GRASSHOPPER, 0, 0, 0, 0));
+    }
+
+    @Test
+    void testMoveJumpingInPlaceIntrudingFail() {
+        assertEquals(legalMove, this.game1.placeCreature(RABBIT, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 0));
+
+        assertEquals(illegalMove, this.game1.moveCreature(RABBIT, 0, 0, 0, 0));
+    }
+
+    @Test
+    void testMoveJumpingCloseStraight() {
+        assertEquals(legalMove, this.game1.placeCreature(GRASSHOPPER, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 0));
+
+        assertEquals(legalMove, this.game1.moveCreature(GRASSHOPPER, 0, 0, 2, 0));
+    }
+
+    @Test
+    void testMoveJumpingCloseNotStraight() {
+        assertEquals(legalMove, this.game1.placeCreature(GRASSHOPPER, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 0));
+
+        assertEquals(illegalMove, this.game1.moveCreature(GRASSHOPPER, 0, 0, 2, -1));
+    }
+
+    @Test
+    void testMoveJumpingFar() {
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(GRASSHOPPER, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 2, 0));
+
+        assertEquals(illegalMove, this.game1.moveCreature(GRASSHOPPER, -1, 0, 3, 0));
+    }
+
+    @Test
+    void testMoveJumpingNotConnected() {
+        assertEquals(legalMove, this.game1.placeCreature(GRASSHOPPER, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 0));
+
+        assertEquals(illegalMove, this.game1.moveCreature(GRASSHOPPER, 0, 0, -1, 0));
+    }
+
+    @Test
+    void testMoveJumpingOverFull() {
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(GRASSHOPPER, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(TURTLE, 2, -1));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, -1, 1));
+        assertEquals(legalMove, this.game1.moveCreature(TURTLE, 2, -1, 1,0));
+
+        assertEquals(legalMove, this.game1.moveCreature(GRASSHOPPER, -1, 0, 2, 0));
+    }
+
+    @Test
+    void testMoveJumpingLandOnCreatureNoIntruding() {
+        assertEquals(legalMove, this.game1.placeCreature(GRASSHOPPER, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 0, 1));
+
+        assertEquals(illegalMove, this.game1.moveCreature(GRASSHOPPER, 0, 0, 0, 1));
+    }
+
+    @Test
+    void testMoveJumpingLandOnCreatureIntruding() {
+        assertEquals(legalMove, this.game1.placeCreature(RABBIT, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 0, 1));
+
+        assertEquals(legalMove, this.game1.moveCreature(RABBIT, 0, 0, 0, 1));
+    }
+
+    @Test
+    void testMoveJumpingDraggable() {
+        assertEquals(legalMove, this.game1.placeCreature(GRASSHOPPER, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 1));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 0, -1));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 2, -1));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, -1, -1));
+        assertEquals(legalMove, this.game1.moveCreature(CRAB, 2, -1, 1, -1));
+
+        assertEquals(legalMove, this.game1.moveCreature(GRASSHOPPER, 0, 0, -1, 1));
+    }
+
+    @Test
+    void testMoveJumpingNotDraggable() {
+        assertEquals(legalMove, this.game1.placeCreature(GRASSHOPPER, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 1, 1));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 0, -1));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 2, -1));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, -2, 0));
+        assertEquals(legalMove, this.game1.moveCreature(CRAB, 1, 1, 0, 1));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, -1, -1));
+        assertEquals(legalMove, this.game1.moveCreature(CRAB, 2, -1, 1, -1));
+
+        assertEquals(legalMove, this.game1.moveCreature(GRASSHOPPER, 0, 0, -1, 1));
     }
 }

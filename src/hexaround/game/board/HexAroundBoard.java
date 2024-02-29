@@ -63,7 +63,7 @@ public class HexAroundBoard {
     public LinkedList<CreaturePiece> getCreaturesAt(int x, int y) {
         HexCoordinate hex = makeCoordinate(x, y);
 
-        return this.occupiedHexes.containsKey(hex) ? new LinkedList<>(this.occupiedHexes.get(hex)) : null;
+        return new LinkedList<>(this.occupiedHexes.getOrDefault(hex, new LinkedList<>()));
     }
 
     /**

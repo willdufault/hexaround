@@ -1,10 +1,7 @@
 package hexaround.game.ability;
 
 import hexaround.game.board.HexAroundBoard;
-import hexaround.game.board.coordinate.HexCoordinate;
 import hexaround.game.rule.CreatureName;
-
-import java.util.HashMap;
 
 import static hexaround.game.board.coordinate.HexCoordinate.makeCoordinate;
 
@@ -26,19 +23,28 @@ public class AbilityFlying extends AbstractAbility implements IAbility {
     @Override
     public boolean isLegalMove(HexAroundBoard board, CreatureName creature, boolean team, boolean intruding,
                                int fromX, int fromY, int toX, int toY, int distance) {
+        if(fromX == toX && fromY == toY) {
+            System.out.println("Not allowed to skip turns.");
+            return false;
+        }
+
         if(board.isFull(toX, toY)) {
+            System.out.println("That tile is full.");
             return false;
         }
 
         if(board.isOccupied(toX, toY) && !intruding) {
+            System.out.println("That tile is occupied and this piece is not intruding.");
             return false;
         }
 
         if(makeCoordinate(fromX, fromY).distanceTo(makeCoordinate(toX, toY)) > distance) {
+            System.out.println("That tile too far.");
             return false;
         }
 
         if(board.isSurrounded(fromX, fromY)) {
+            System.out.println("Flying pieces can't move when surrounded.");
             return false;
         }
 
@@ -50,6 +56,10 @@ public class AbilityFlying extends AbstractAbility implements IAbility {
 
         board.removeCreature(creature, team, toX, toY);
         board.placeCreatureAt(creature, team, fromX, fromY);
+
+        if(!connected) {
+            System.out.println("That move leaves the colony disconnected.");
+        }
 
         return connected;
     }

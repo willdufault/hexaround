@@ -24,27 +24,46 @@ public class AbilityJumping extends AbstractAbility implements IAbility {
      * @return True if the move is legal.
      */
     @Override
-    public boolean isLegalMove(HexAroundBoard board, CreatureName creature, boolean team, boolean intruding, int fromX, int fromY, int toX, int toY, int distance) {
-        return false;
-    }
+    public boolean isLegalMove(HexAroundBoard board, CreatureName creature, boolean team, boolean intruding,
+                               int fromX, int fromY, int toX, int toY, int distance) {
+        if(fromX == toX && fromY == toY) {
+            System.out.println("Not allowed to skip turns.");
+            return false;
+        }
 
-    /**
-     * Recursively determine if there is a path from (x, y) to (toX, toY).
-     *
-     * @param board     The hex board.
-     * @param creature  A creature name.
-     * @param team      The creature's team.
-     * @param intruding Whether the creature has the intruding attribute.
-     * @param x         The current x coordinate.
-     * @param y         The current y coordinate.
-     * @param toX       The destination x coordinate.
-     * @param toY       The destination y coordinate.
-     * @param remaining The number of remaining moves.
-     * @param record    A HashMap storing the highest number of moves remaining for each visited tile.
-     * @return True if a path exists.
-     */
-    @Override
-    public boolean pathExists(HexAroundBoard board, CreatureName creature, boolean team, boolean intruding, int x, int y, int toX, int toY, int remaining, HashMap<HexCoordinate, Integer> record) {
-        return false;
+        if(board.isFull(toX, toY)) {
+            System.out.println("That tile is full.");
+            return false;
+        }
+
+        if(board.isOccupied(toX, toY) && !intruding) {
+            System.out.println("That tile is occupied and this piece is not intruding.");
+            return false;
+        }
+
+        if(makeCoordinate(fromX, fromY).distanceTo(makeCoordinate(toX, toY)) > distance) {
+            System.out.println("That tile too far.");
+            return false;
+        }
+
+        if(!makeCoordinate(fromX, fromY).isLinear(makeCoordinate(toX, toY))) {
+            System.out.println("Jumping pieces must move in a straight line.");
+            return false;
+        }
+
+        // Check for connectedness.
+        board.removeCreature(creature, team, fromX, fromY);
+        board.placeCreatureAt(creature, team, toX, toY);
+
+        boolean connected = board.isColonyConnected();
+
+        board.removeCreature(creature, team, toX, toY);
+        board.placeCreatureAt(creature, team, fromX, fromY);
+
+        if(!connected) {
+            System.out.println("That move leaves the colony disconnected.");
+        }
+
+        return connected;
     }
 }
