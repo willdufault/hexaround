@@ -1,7 +1,6 @@
 package hexaround.game.ability;
 
 import hexaround.game.board.HexAroundBoard;
-import hexaround.game.board.coordinate.HexCoordinate;
 import hexaround.game.rule.CreatureName;
 
 import java.util.HashMap;

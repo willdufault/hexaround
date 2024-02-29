@@ -2,6 +2,7 @@ package hexaround.game;
 
 import hexaround.config.*;
 import hexaround.game.ability.*;
+import hexaround.game.attribute.*;
 import hexaround.game.board.*;
 import hexaround.game.board.coordinate.*;
 import hexaround.game.board.piece.CreaturePiece;
@@ -16,9 +17,11 @@ import static hexaround.game.move.MoveResult.*;
 public class HexAroundFirstSubmission implements IHexAround1{
 
     private HexAroundBoard board = null;
-    private Map<CreatureName, CreatureDefinition> creatures = null;
-    private Map<CreatureProperty, IAbility> abilityMap = null;
-    // Boolean to keep track of which team's turn it is.
+    private HashMap<CreatureName, CreatureDefinition> creatureMap = null;
+    private HashMap<CreatureProperty, IAbility> abilityMap = null;
+    private HashMap<CreatureProperty, IAttribute> attributeMap = null;
+    private HashMap<CreatureName, Integer> blueCreatures = null;
+    private HashMap<CreatureName, Integer> redCreatures = null;
     private boolean team = true;
     // 2 moves = 1 turn. (One move from both players.)
     private int moveCount = 0;
@@ -32,7 +35,7 @@ public class HexAroundFirstSubmission implements IHexAround1{
      */
     public HexAroundFirstSubmission() {
         this.initializeAbilityMap();
-    }
+        this.initializeAttributeMap();}
 
     public void initializeAbilityMap() {
         this.abilityMap = new HashMap<>();
@@ -40,6 +43,12 @@ public class HexAroundFirstSubmission implements IHexAround1{
         this.abilityMap.put(CreatureProperty.RUNNING, new AbilityRunning());
         this.abilityMap.put(CreatureProperty.JUMPING, new AbilityJumping());
         this.abilityMap.put(CreatureProperty.FLYING, new AbilityFlying());
+    }
+
+    public void initializeAttributeMap() {
+        this.attributeMap = new HashMap<>();
+        this.attributeMap.put(CreatureProperty.KAMIKAZE, new AttributeKamikaze());
+        this.attributeMap.put(CreatureProperty.SWAPPING, new AttributeSwapping());
     }
 
     public boolean getTeam() {
@@ -78,7 +87,7 @@ public class HexAroundFirstSubmission implements IHexAround1{
         boolean result = false;
         CreatureName creature = board.getCreatureAt(x, y);
         if (creature != null) {
-            CreatureDefinition cd = creatures.get(creature);
+            CreatureDefinition cd = creatureMap.get(creature);
             if (cd != null) {
                 result = cd.properties().contains(property);
             }
@@ -92,7 +101,7 @@ public class HexAroundFirstSubmission implements IHexAround1{
      * @return The CreatureProperty (movement ability) of this creature.
      */
     public CreatureProperty getAbility(CreatureName creature) {
-        for(CreatureProperty property : this.creatures.get(creature).properties()) {
+        for(CreatureProperty property : this.creatureMap.get(creature).properties()) {
             if(this.abilityMap.containsKey(property)) {
                 return property;
             }
@@ -108,7 +117,7 @@ public class HexAroundFirstSubmission implements IHexAround1{
      * @return
      */
     public boolean creatureHasProperty(CreatureName creature, CreatureProperty property) {
-        return this.creatures.get(creature).properties().contains(property);
+        return this.creatureMap.get(creature).properties().contains(property);
     }
 
     /**
@@ -143,7 +152,7 @@ public class HexAroundFirstSubmission implements IHexAround1{
         boolean result = false;
         CreatureName creature = getCreatureAt(x1, y1);
         if (creature != null) {
-            CreatureDefinition cd = creatures.get(creature);
+            CreatureDefinition cd = creatureMap.get(creature);
             int maxDistance = cd.maxDistance();
             HexCoordinate c1 = new HexCoordinate(x1, y1);
             int actualDistance = c1.distanceTo(new HexCoordinate(x2, y2));
@@ -168,6 +177,17 @@ public class HexAroundFirstSubmission implements IHexAround1{
      */
     private boolean isCreatureButterfly(CreatureName creature) {
         return creature.name().equals(CreatureName.BUTTERFLY.name());
+    }
+
+    /**
+     *
+     * @param team
+     * @return
+     */
+    private boolean isButterflySurrounded(boolean team) {
+        HexCoordinate butterfly = board.getButterflyTile(team);
+
+        return this.board.isSurrounded(butterfly.x(), butterfly.y());
     }
 
     /**
@@ -202,6 +222,9 @@ public class HexAroundFirstSubmission implements IHexAround1{
         this.moveCount += 1;
         this.team = !this.team;
 
+        // todo: add game over/tie check here
+        // todo: make sure game stops and no more moves can be played
+
         return new MoveResponse(OK, "Legal move");
     }
 
@@ -222,15 +245,19 @@ public class HexAroundFirstSubmission implements IHexAround1{
 
         if(!this.abilityMap.get(this.getAbility(creature)).isLegalMove(this.board, creature, this.team,
                 this.creatureHasProperty(creature, CreatureProperty.INTRUDING), fromX, fromY, toX, toY,
-                this.creatures.get(creature).maxDistance())) {
+                this.creatureMap.get(creature).maxDistance())) {
             // todo: replace this with a more descriptive message
             return new MoveResponse(MOVE_ERROR, "Illegal move");
         }
 
-        this.board.removeCreature(creature, this.team, fromX, fromY);
+        int index = this.board.removeCreature(creature, this.team, fromX, fromY);
         this.board.placeCreatureAt(creature, this.team, toX, toY);
         this.moveCount += 1;
         this.team = !this.team;
+
+        // todo: attribute takes effect here, might also need index for swapping
+
+        // todo: add game over/tie check here
 
         return new MoveResponse(OK, "Legal move");
     }
@@ -262,10 +289,10 @@ public class HexAroundFirstSubmission implements IHexAround1{
         this.board = board;
     }
 
-    public void setCreatures(Collection<CreatureDefinition> creatureDefs) {
-        creatures = new HashMap<>();
+    public void setCreatureMap(Collection<CreatureDefinition> creatureDefs) {
+        creatureMap = new HashMap<>();
         for (CreatureDefinition cd : creatureDefs) {
-            creatures.put(cd.name(), cd);
+            creatureMap.put(cd.name(), cd);
         }
     }
 }

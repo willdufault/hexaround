@@ -745,4 +745,42 @@ public class FinalTest {
 
         assertEquals(legalMove, this.game1.moveCreature(GRASSHOPPER, 0, 0, -1, 1));
     }
+
+    @Test
+    void testOrderStaysMoveSearchBottom() {
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(TURTLE, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 2, 0));
+
+        assertEquals(legalMove, this.game1.moveCreature(TURTLE, -1, 0, 2, 0));
+
+        assertEquals(CRAB, this.game1.getCreatureAt(2, 0));
+
+        assertEquals(illegalMove, this.game1.moveCreature(CRAB, 2, 0, 4, 0));
+
+        assertEquals(CRAB, this.game1.getCreatureAt(2, 0));
+    }
+
+    @Test
+    void testOrderStaysMoveSearchTop() {
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 0, 0));
+        assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(TURTLE, -1, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 2, 0));
+
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 0, -1));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 2, -1));
+
+        assertEquals(legalMove, this.game1.moveCreature(TURTLE, -1, 0, 2, 0));
+        assertEquals(legalMove, this.game1.placeCreature(CRAB, 3, -2));
+
+        assertEquals(CRAB, this.game1.getCreatureAt(2, 0));
+
+        assertEquals(illegalMove, this.game1.moveCreature(TURTLE, 2, 0, 4, 0));
+
+        assertEquals(CRAB, this.game1.getCreatureAt(2, 0));
+    }
 }

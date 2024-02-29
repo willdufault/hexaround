@@ -49,13 +49,13 @@ public class AbilityFlying extends AbstractAbility implements IAbility {
         }
 
         // Check for connectedness.
-        board.removeCreature(creature, team, fromX, fromY);
+        int index = board.removeCreature(creature, team, fromX, fromY);
         board.placeCreatureAt(creature, team, toX, toY);
 
         boolean connected = board.isColonyConnected();
 
         board.removeCreature(creature, team, toX, toY);
-        board.placeCreatureAt(creature, team, fromX, fromY);
+        board.placeCreatureAt(creature, team, fromX, fromY, index);
 
         if(!connected) {
             System.out.println("That move leaves the colony disconnected.");

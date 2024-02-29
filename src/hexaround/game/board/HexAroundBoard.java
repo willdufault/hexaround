@@ -168,21 +168,37 @@ public class HexAroundBoard {
     }
 
     /**
+     *
+     * @param creature
+     * @param team
+     * @param x
+     * @param y
+     */
+    public void placeCreatureAt(CreatureName creature, boolean team, int x, int y) {
+        int index = 0;
+
+        HexCoordinate hex = makeCoordinate(x, y);
+        if(this.occupiedHexes.containsKey(hex)) {
+            index = this.occupiedHexes.get(hex).size();
+        }
+
+        this.placeCreatureAt(creature, team, x, y, index);
+    }
+
+    /**
      * Put a creature on the board.
      * @param creature
      * @param x
      * @param y
      * @return true if okay, false if there is a piece on the location
      */
-    public void placeCreatureAt(CreatureName creature, boolean team, int x, int y) {
-
-        //todo: need to pass in an index to place the creature at that position in the list
+    public void placeCreatureAt(CreatureName creature, boolean team, int x, int y, int index) {
         HexCoordinate hex = makeCoordinate(x, y);
 
         if(!this.occupiedHexes.containsKey(hex))
             this.occupiedHexes.put(hex, new LinkedList<>());
 
-        this.occupiedHexes.get(hex).add(new CreaturePiece(creature, team));
+        this.occupiedHexes.get(hex).add(index, new CreaturePiece(creature, team));
 
         if(creature.name().equals(CreatureName.BUTTERFLY.name())) {
             if(team)
@@ -196,24 +212,19 @@ public class HexAroundBoard {
     /**
      * Removes the creature at the given coordinate.
      */
-    public void removeCreature(CreatureName creature, boolean team, int x, int y) {
-
-        // todo: need to return the index the creature was at so i can place it back after
+    public int removeCreature(CreatureName creature, boolean team, int x, int y) {
         HexCoordinate hex = makeCoordinate(x, y);
         LinkedList<CreaturePiece> pieces = this.occupiedHexes.get(hex);
 
         if(pieces.size() == 1) {
             this.occupiedHexes.remove(hex);
-            return;
+            return 0;
         }
 
-        // Remove the first matching instance.
-        for(CreaturePiece cp : pieces) {
-            if (cp.creature().name().equals(creature.name()) && cp.team() == team) {
-                pieces.remove(cp);
-                break;
-            }
-        }
+        int index = pieces.indexOf(new CreaturePiece(creature, team));
+        pieces.remove(index);
+
+        return index;
     }
 
     /**

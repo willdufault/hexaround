@@ -94,16 +94,14 @@ public class AbilityWalking extends AbstractAbility implements IAbility {
                 continue;
             }
 
-            // todo: need to place creature back in the same position they were in originally
-            // todo: MATTERS IF CREATURE ON TOP IS INTRUDING, NEED TO PUT THEM BACK ON TOP
-            board.removeCreature(creature, team, x, y);
+            int index = board.removeCreature(creature, team, x, y);
             board.placeCreatureAt(creature, team, nextX, nextY);
 
             boolean result = this.pathExists(board, creature, team, intruding, nextX, nextY, toX, toY,
                     remaining - 1, record);
 
             board.removeCreature(creature, team, nextX, nextY);
-            board.placeCreatureAt(creature, team, x, y);
+            board.placeCreatureAt(creature, team, x, y, index);
 
             if(result) {
                 return true;
