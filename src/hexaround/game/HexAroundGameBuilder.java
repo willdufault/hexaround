@@ -24,6 +24,12 @@ import hexaround.game.board.*;
 import java.io.*;
 
 public class HexAroundGameBuilder {
+    /**
+     * Create an instance of a HexAround game.
+     * @param configurationFile The game configuration.
+     * @return The game manager.
+     * @throws IOException If file is not found.
+     */
     public static IHexAroundFinal buildGameManager(String configurationFile) throws IOException {
         HexAroundConfigurationMaker configurationMaker =
             new HexAroundConfigurationMaker(configurationFile);
