@@ -80,22 +80,4 @@ public record HexCoordinate(int x, int y) {
         neighbors.add(new HexCoordinate(x - 1, y));
         return neighbors;
     }
-
-    @Override
-    public String toString() {
-        return "HexCoordinate{" +
-                "x=" + x +
-                ", y=" + y +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof HexCoordinate that)) return false;
-
-        if (x != that.x) return false;
-        return y == that.y;
-    }
-
 }

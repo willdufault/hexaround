@@ -1,8 +1,10 @@
 package hexaround.game.ability;
 
 import hexaround.game.board.HexAroundBoard;
+import hexaround.game.move.MoveResponse;
 import hexaround.game.rule.CreatureName;
 
+import static hexaround.game.move.MoveResult.*;
 import static hexaround.game.board.coordinate.HexCoordinate.makeCoordinate;
 
 public class AbilityFlying extends AbstractAbility implements IAbility {
@@ -21,31 +23,26 @@ public class AbilityFlying extends AbstractAbility implements IAbility {
      * @return True if the move is legal.
      */
     @Override
-    public boolean isLegalMove(HexAroundBoard board, CreatureName creature, boolean team, boolean intruding,
-                               int fromX, int fromY, int toX, int toY, int distance) {
+    public MoveResponse isLegalMove(HexAroundBoard board, CreatureName creature, boolean team, boolean intruding,
+                               boolean removes, int fromX, int fromY, int toX, int toY, int distance) {
         if(fromX == toX && fromY == toY) {
-            System.out.println("Not allowed to skip turns.");
-            return false;
+            return new MoveResponse(MOVE_ERROR, "Not allowed to skip turns.");
         }
 
-        if(board.isFull(toX, toY)) {
-            System.out.println("That tile is full.");
-            return false;
+        if(board.isFull(toX, toY) && !removes) {
+            return new MoveResponse(MOVE_ERROR, "That tile is full.");
         }
 
         if(board.isOccupied(toX, toY) && !intruding) {
-            System.out.println("That tile is occupied and this piece is not intruding.");
-            return false;
+            return new MoveResponse(MOVE_ERROR, "That tile is occupied and this piece is not intruding.");
         }
 
         if(makeCoordinate(fromX, fromY).distanceTo(makeCoordinate(toX, toY)) > distance) {
-            System.out.println("That tile too far.");
-            return false;
+            return new MoveResponse(MOVE_ERROR, "That tile too far.");
         }
 
         if(board.isSurrounded(fromX, fromY)) {
-            System.out.println("Flying pieces can't move when surrounded.");
-            return false;
+            return new MoveResponse(MOVE_ERROR, "Flying pieces can't move when surrounded.");
         }
 
         // Check for connectedness.
@@ -57,10 +54,7 @@ public class AbilityFlying extends AbstractAbility implements IAbility {
         board.removeCreature(creature, team, toX, toY);
         board.placeCreatureAt(creature, team, fromX, fromY, index);
 
-        if(!connected) {
-            System.out.println("That move leaves the colony disconnected.");
-        }
-
-        return connected;
+        return connected ? new MoveResponse(OK, "Legal move.")
+                : new MoveResponse(MOVE_ERROR, "That move leaves the colony disconnected.");
     }
 }

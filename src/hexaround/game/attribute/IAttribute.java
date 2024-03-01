@@ -1,25 +1,24 @@
 package hexaround.game.attribute;
 
-import hexaround.game.board.coordinate.HexCoordinate;
-import hexaround.game.board.piece.CreaturePiece;
+import hexaround.game.board.HexAroundBoard;
 import hexaround.game.rule.CreatureName;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public interface IAttribute {
     /**
-     * todo (in interface)
+     * todo
      * @param board
-     * @param blueCreatures
-     * @param redCreatures
+     * @param playerInventories
      * @param creature
      * @param team
      * @param fromX
      * @param fromY
      * @param toX
      * @param toY
+     * @param index
      */
-    void takeEffect(HashMap<HexCoordinate, CreaturePiece> board, HashMap<CreatureName, Integer> blueCreatures,
-                    HashMap<CreatureName, Integer> redCreatures, CreatureName creature, boolean team,
-                    int fromX, int fromY, int toX, int toY, int index);
+    void takeEffect(HexAroundBoard board, Map<Boolean, Map<CreatureName, Integer>> playerInventories,
+                    CreatureName creature, boolean team, int fromX, int fromY, int toX, int toY, int index);
 }

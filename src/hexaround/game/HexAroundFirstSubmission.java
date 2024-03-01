@@ -9,6 +9,7 @@ import hexaround.game.board.piece.CreaturePiece;
 import hexaround.game.move.MoveResponse;
 import hexaround.game.rule.CreatureName;
 import hexaround.game.rule.CreatureProperty;
+import hexaround.game.rule.PlayerName;
 
 import java.util.*;
 
@@ -17,14 +18,14 @@ import static hexaround.game.move.MoveResult.*;
 public class HexAroundFirstSubmission implements IHexAround1{
 
     private HexAroundBoard board = null;
-    private HashMap<CreatureName, CreatureDefinition> creatureMap = null;
-    private HashMap<CreatureProperty, IAbility> abilityMap = null;
-    private HashMap<CreatureProperty, IAttribute> attributeMap = null;
-    private HashMap<CreatureName, Integer> blueCreatures = null;
-    private HashMap<CreatureName, Integer> redCreatures = null;
+    private Map<CreatureName, CreatureDefinition> creatureMap = null;
+    private Map<CreatureProperty, IAbility> abilityMap = null;
+    private Map<CreatureProperty, IAttribute> attributeMap = null;
+    private Map<Boolean, Map<CreatureName, Integer>> playerInventories = null;
     private boolean team = true;
     // 2 moves = 1 turn. (One move from both players.)
     private int moveCount = 0;
+    private boolean gameOver = false;
 
     /**
      * This is the default constructor, and the only constructor
@@ -35,20 +36,7 @@ public class HexAroundFirstSubmission implements IHexAround1{
      */
     public HexAroundFirstSubmission() {
         this.initializeAbilityMap();
-        this.initializeAttributeMap();}
-
-    public void initializeAbilityMap() {
-        this.abilityMap = new HashMap<>();
-        this.abilityMap.put(CreatureProperty.WALKING, new AbilityWalking());
-        this.abilityMap.put(CreatureProperty.RUNNING, new AbilityRunning());
-        this.abilityMap.put(CreatureProperty.JUMPING, new AbilityJumping());
-        this.abilityMap.put(CreatureProperty.FLYING, new AbilityFlying());
-    }
-
-    public void initializeAttributeMap() {
-        this.attributeMap = new HashMap<>();
-        this.attributeMap.put(CreatureProperty.KAMIKAZE, new AttributeKamikaze());
-        this.attributeMap.put(CreatureProperty.SWAPPING, new AttributeSwapping());
+        this.initializeAttributeMap();
     }
 
     public boolean getTeam() {
@@ -69,7 +57,18 @@ public class HexAroundFirstSubmission implements IHexAround1{
      */
     @Override
     public CreatureName getCreatureAt(int x, int y) {
-        return board.getCreatureAt(x, y);
+        return board.getCreatureAt(x, y, 0);
+    }
+
+    /**
+     *
+     * @param x
+     * @param y
+     * @param index
+     * @return
+     */
+    public CreatureName getCreatureAt(int x, int y, int index) {
+        return board.getCreatureAt(x, y, index);
     }
 
     /**
@@ -85,7 +84,7 @@ public class HexAroundFirstSubmission implements IHexAround1{
     @Override
     public boolean hasProperty(int x, int y, CreatureProperty property) {
         boolean result = false;
-        CreatureName creature = board.getCreatureAt(x, y);
+        CreatureName creature = board.getCreatureAt(x, y, 0);
         if (creature != null) {
             CreatureDefinition cd = creatureMap.get(creature);
             if (cd != null) {
@@ -108,6 +107,23 @@ public class HexAroundFirstSubmission implements IHexAround1{
         }
 
         return null;
+    }
+
+    /**
+     * Get all attributes of a given creature.
+     * @param creature A creature name.
+     * @return A list of all attributes for the given creature.
+     */
+    public LinkedList<CreatureProperty> getAttributes(CreatureName creature) {
+        LinkedList<CreatureProperty> attributes = new LinkedList<>();
+
+        for(CreatureProperty property : this.creatureMap.get(creature).properties()) {
+            if(this.attributeMap.containsKey(property)) {
+                attributes.add(property);
+            }
+        }
+
+        return attributes;
     }
 
     /**
@@ -163,6 +179,7 @@ public class HexAroundFirstSubmission implements IHexAround1{
 
     /**
      * Determines if the current team's butterfly is down.
+     * @param team The player whose butterfly to check.
      * @return True if the butterfly is down.
      */
     private boolean isButterflyDown(boolean team) {
@@ -176,7 +193,37 @@ public class HexAroundFirstSubmission implements IHexAround1{
      * @return True if the given creature is a butterfly.
      */
     private boolean isCreatureButterfly(CreatureName creature) {
-        return creature.name().equals(CreatureName.BUTTERFLY.name());
+        return creature.equals(CreatureName.BUTTERFLY);
+    }
+
+    /**
+     *
+     * @param team
+     * @param creature
+     * @return
+     */
+    private boolean playerHasCreature(boolean team, CreatureName creature) {
+        return this.playerInventories.get(team).containsKey(creature);
+    }
+
+    /**
+     *
+     * @param team
+     * @param creature
+     * @return
+     */
+    private boolean playerHasEnough(boolean team, CreatureName creature) {
+        return this.playerInventories.get(team).get(creature) > 0;
+    }
+
+    /**
+     *
+     * @param team
+     * @param creature
+     * @param delta
+     */
+    private void updateInventory(boolean team, CreatureName creature, int delta) {
+        this.playerInventories.get(team).put(creature, this.playerInventories.get(team).get(creature) + delta);
     }
 
     /**
@@ -187,7 +234,30 @@ public class HexAroundFirstSubmission implements IHexAround1{
     private boolean isButterflySurrounded(boolean team) {
         HexCoordinate butterfly = board.getButterflyTile(team);
 
+        if(butterfly == null) {
+            return false;
+        }
+
         return this.board.isSurrounded(butterfly.x(), butterfly.y());
+    }
+
+    private MoveResponse getGameOverStatus() {
+        boolean blueSurrounded = this.isButterflySurrounded(true);
+        boolean redSurrounded = this.isButterflySurrounded(false);
+
+        if(blueSurrounded && redSurrounded) {
+            return new MoveResponse(DRAW, "Draw. Both butterflies surrounded.");
+        }
+
+        if(blueSurrounded) {
+            return new MoveResponse(RED_WON, "Red wins. Blue's butterfly is surrounded.");
+        }
+
+        if(redSurrounded) {
+            return new MoveResponse(BLUE_WON, "Blue wins. Red's butterfly is surrounded.");
+        }
+
+        return new MoveResponse(OK, "Game continues.");
     }
 
     /**
@@ -201,6 +271,18 @@ public class HexAroundFirstSubmission implements IHexAround1{
      */
     @Override
     public MoveResponse placeCreature(CreatureName creature, int x, int y) {
+        if(this.gameOver) {
+            return new MoveResponse(MOVE_ERROR, "Game is over.");
+        }
+
+        if(!this.playerHasCreature(this.team, creature)) {
+            return new MoveResponse(MOVE_ERROR, "Player does not have that creature.");
+        }
+
+        if(!this.playerHasEnough(this.team, creature)) {
+            return new MoveResponse(MOVE_ERROR, "Player is out of those creatures.");
+        }
+
         if(this.isOccupied(x, y)) {
             return new MoveResponse(MOVE_ERROR, "Tile is already occupied.");
         }
@@ -218,14 +300,17 @@ public class HexAroundFirstSubmission implements IHexAround1{
         }
 
         this.board.placeCreatureAt(creature, this.team, x, y);
-
+        this.updateInventory(this.team, creature, -1);
         this.moveCount += 1;
         this.team = !this.team;
 
-        // todo: add game over/tie check here
-        // todo: make sure game stops and no more moves can be played
+        MoveResponse gameOverResponse = this.getGameOverStatus();
+        if(!gameOverResponse.moveResult().equals(OK)) {
+            this.gameOver = true;
+            return gameOverResponse;
+        }
 
-        return new MoveResponse(OK, "Legal move");
+        return new MoveResponse(OK, "Legal move.");
     }
 
     /**
@@ -239,15 +324,22 @@ public class HexAroundFirstSubmission implements IHexAround1{
      */
     @Override
     public MoveResponse moveCreature(CreatureName creature, int fromX, int fromY, int toX, int toY) {
+        if(this.gameOver) {
+            return new MoveResponse(MOVE_ERROR, "Game is over.");
+        }
+
         if(!this.board.getCreaturesAt(fromX, fromY).contains(new CreaturePiece(creature, this.team))) {
             return new MoveResponse(MOVE_ERROR, "There is no matching creature piece to move on that tile.");
         }
 
-        if(!this.abilityMap.get(this.getAbility(creature)).isLegalMove(this.board, creature, this.team,
-                this.creatureHasProperty(creature, CreatureProperty.INTRUDING), fromX, fromY, toX, toY,
-                this.creatureMap.get(creature).maxDistance())) {
-            // todo: replace this with a more descriptive message
-            return new MoveResponse(MOVE_ERROR, "Illegal move");
+        // If this is non-empty, the creature is either kamikaze or swapping and can land on full tiles.
+        LinkedList<CreatureProperty> attributes = this.getAttributes(creature);
+        MoveResponse legalMoveResponse = this.abilityMap.get(this.getAbility(creature)).isLegalMove(this.board, creature,
+                this.team, this.creatureHasProperty(creature, CreatureProperty.INTRUDING), attributes.size() > 0,
+                fromX, fromY, toX, toY, this.creatureMap.get(creature).maxDistance());
+
+        if(!legalMoveResponse.moveResult().equals(OK)) {
+            return legalMoveResponse;
         }
 
         int index = this.board.removeCreature(creature, this.team, fromX, fromY);
@@ -255,33 +347,18 @@ public class HexAroundFirstSubmission implements IHexAround1{
         this.moveCount += 1;
         this.team = !this.team;
 
-        // todo: attribute takes effect here, might also need index for swapping
-
-        // todo: add game over/tie check here
-
-        return new MoveResponse(OK, "Legal move");
-    }
-
-    /**
-     * Return true if the given move satisfies the following conditions:
-     *   1) The move is within the piece's max distance.
-     *   2) The colony will remain connected after the piece is moved.
-     */
-    private boolean isLegalMove(CreatureName creature, int fromX, int fromY, int toX, int toY) {
-        if(!board.isCreatureAt(fromX, fromY) || !canReach(fromX, fromY, toX, toY)) {
-            return false;
+        for(CreatureProperty attribute : attributes) {
+            this.attributeMap.get(attribute).takeEffect(board, this.playerInventories, creature, this.team,
+                    fromX, fromY, toX, toY, index);
         }
 
-        // Move the piece and check that the colony is still connected.
-        this.board.removeCreature(creature, this.team, fromX, fromY);
-        this.board.placeCreatureAt(creature, this.team, toX, toY);
-        boolean connected = this.board.isColonyConnected();
+        MoveResponse gameOverResponse = this.getGameOverStatus();
+        if(!gameOverResponse.moveResult().equals(OK)) {
+            this.gameOver = true;
+            return gameOverResponse;
+        }
 
-        // Move the piece back.
-        this.board.removeCreature(creature, this.team, toX, toY);
-        this.board.placeCreatureAt(creature, this.team, fromX, fromY);
-
-        return connected;
+        return legalMoveResponse;
     }
 
     /************************************ Helpers *********************************/
@@ -290,9 +367,33 @@ public class HexAroundFirstSubmission implements IHexAround1{
     }
 
     public void setCreatureMap(Collection<CreatureDefinition> creatureDefs) {
-        creatureMap = new HashMap<>();
+        this.creatureMap = new HashMap<>();
         for (CreatureDefinition cd : creatureDefs) {
-            creatureMap.put(cd.name(), cd);
+            this.creatureMap.put(cd.name(), cd);
         }
+    }
+
+    public void setPlayerInventories(Collection<PlayerConfiguration> playerConfigs) {
+        this.playerInventories = new HashMap<>();
+
+        for(PlayerConfiguration pc : playerConfigs) {
+            boolean team = pc.Player().equals(PlayerName.BLUE);
+
+            this.playerInventories.put(team, new HashMap<>(pc.creatures()));
+        }
+    }
+
+    public void initializeAbilityMap() {
+        this.abilityMap = new HashMap<>();
+        this.abilityMap.put(CreatureProperty.WALKING, new AbilityWalking());
+        this.abilityMap.put(CreatureProperty.RUNNING, new AbilityRunning());
+        this.abilityMap.put(CreatureProperty.JUMPING, new AbilityJumping());
+        this.abilityMap.put(CreatureProperty.FLYING, new AbilityFlying());
+    }
+
+    public void initializeAttributeMap() {
+        this.attributeMap = new HashMap<>();
+        this.attributeMap.put(CreatureProperty.KAMIKAZE, new AttributeKamikaze());
+        this.attributeMap.put(CreatureProperty.SWAPPING, new AttributeSwapping());
     }
 }

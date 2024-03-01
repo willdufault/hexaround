@@ -2,11 +2,12 @@ package hexaround.game.ability;
 
 import hexaround.game.board.HexAroundBoard;
 import hexaround.game.board.coordinate.HexCoordinate;
+import hexaround.game.move.MoveResponse;
 import hexaround.game.rule.CreatureName;
 
-import java.util.HashMap;
 import java.util.HashSet;
 
+import static hexaround.game.move.MoveResult.*;
 import static hexaround.game.board.coordinate.HexCoordinate.makeCoordinate;
 
 public class AbilityRunning extends AbstractAbility implements IAbility {
@@ -24,24 +25,27 @@ public class AbilityRunning extends AbstractAbility implements IAbility {
      * @param distance  The max distance this piece can move.
      * @return True if the move is legal.
      */
-    public boolean isLegalMove(HexAroundBoard board, CreatureName creature, boolean team, boolean intruding,
-                               int fromX, int fromY, int toX, int toY, int distance) {
+    public MoveResponse isLegalMove(HexAroundBoard board, CreatureName creature, boolean team, boolean intruding,
+                                    boolean removes, int fromX, int fromY, int toX, int toY, int distance) {
         if(makeCoordinate(fromX, fromY).distanceTo(makeCoordinate(toX, toY)) != distance) {
-            System.out.println("Distance between tiles must match the max distance.");
-            return false;
+            return new MoveResponse(MOVE_ERROR, "Distance between tiles must match the max distance.");
         }
 
-        if(board.isFull(toX, toY)) {
-            System.out.println("That tile is full.");
-            return false;
+        if(!board.hasOccupiedNeighbor(toX, toY)) {
+            return new MoveResponse(MOVE_ERROR, "That move leaves the colony disconnected.");
+        }
+
+        if(board.isFull(toX, toY) && !removes) {
+            return new MoveResponse(MOVE_ERROR, "That tile is full.");
         }
 
         if(board.isOccupied(toX, toY) && !intruding) {
-            System.out.println("That tile is occupied and this piece is not intruding.");
-            return false;
+            return new MoveResponse(MOVE_ERROR, "That tile is occupied and this piece is not intruding.");
         }
 
-        return this.pathExists(board, creature, team, intruding, fromX, fromY, toX, toY, distance, new HashSet<>());
+        return this.pathExists(board, creature, team, intruding, fromX, fromY, toX, toY, distance, new HashSet<>())
+                ? new MoveResponse(OK, "Legal move.")
+                : new MoveResponse(MOVE_ERROR, "No legal path exists.");
     }
 
     /**

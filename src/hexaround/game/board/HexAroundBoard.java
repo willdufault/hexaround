@@ -39,19 +39,42 @@ public class HexAroundBoard {
     /**
      * @param x
      * @param y
+     * @param index
      * @return the Creature definition of the creature at (x, y) or
      *  null if there is none.
      */
-    public CreatureName getCreatureAt(int x, int y) {
+    public CreatureName getCreatureAt(int x, int y, int index) {
         HexCoordinate hex = makeCoordinate(x, y);
 
-        if(!this.occupiedHexes.containsKey(hex)) return null;
+        if(!this.occupiedHexes.containsKey(hex)) {
+            return null;
+        }
 
-        return occupiedHexes.get(makeCoordinate(x, y)).get(0).creature();
+        LinkedList<CreaturePiece> creatures = this.occupiedHexes.get(makeCoordinate(x, y));
+
+        if(index >= creatures.size()) {
+            return null;
+        }
+
+        return creatures.get(index).creature();
     }
 
     public HexCoordinate getButterflyTile(boolean team) {
         return team ? this.blueButterfly : this.redButterfly;
+    }
+
+    /**
+     * Clear the butterfly tile for the given team.
+     * @param team The team whose butterfly should be cleared.
+     */
+    public void clearButterflyTile(boolean team) {
+        if(team) {
+            this.blueButterfly = null;
+        }
+
+        else {
+            this.redButterfly = null;
+        }
     }
 
     /**
@@ -64,16 +87,6 @@ public class HexAroundBoard {
         HexCoordinate hex = makeCoordinate(x, y);
 
         return new LinkedList<>(this.occupiedHexes.getOrDefault(hex, new LinkedList<>()));
-    }
-
-    /**
-     *
-     * @param x
-     * @param y
-     * @return
-     */
-    public boolean isCreatureAt(int x, int y) {
-        return occupiedHexes.containsKey(makeCoordinate(x, y));
     }
 
     /**
@@ -200,7 +213,7 @@ public class HexAroundBoard {
 
         this.occupiedHexes.get(hex).add(index, new CreaturePiece(creature, team));
 
-        if(creature.name().equals(CreatureName.BUTTERFLY.name())) {
+        if(creature.equals(CreatureName.BUTTERFLY)) {
             if(team)
                 this.blueButterfly = hex;
 

@@ -32,10 +32,9 @@ public class HexAroundGameBuilder {
 //        System.out.println(configuration);
         HexAroundFirstSubmission gameManager = new HexAroundFirstSubmission();
 
-        System.out.println(configuration.players());
-
         gameManager.setBoard(new HexAroundBoard());
         gameManager.setCreatureMap(configuration.creatures());
+        gameManager.setPlayerInventories(configuration.players());
 
         return gameManager;
     }
