@@ -1,4 +1,3 @@
-
 # TDD
   
 ---  
@@ -22,7 +21,7 @@
 | `testSecondMoveLegal` | Test | X | Test that placing a piece next to the first piece is legal. |
 | `testButterflyRoundFourRequired` | Test | X | Test that players must place the butterfly by round four. |
 | `testButterflyKamikazeRoundFourRequired` | Test | X | Test that butterflies are forced if kamikaze'd after round three. |
-| `testPlaceNextToEnemyPieceIllegal` | Test | X | Test that placign a piece next to the enemy after the first round is illegal. |
+| `testPlaceNextToEnemyPieceIllegal` | Test | X | Test that placing a piece next to the enemy after the first round is illegal. |
 | `testMoveButterflyClose` | Test | X | Test moving a butterfly 1 tile succeeds. |
 | `testMoveButterflyFar` | Test | X | Test moving a butterfly multiple tiles fails. |
 | `testMoveButterflyOnTop` | Test | X | Test that butterflies can't be moved on top of another piece. |
@@ -36,9 +35,10 @@
 | `testNoMatchingPiece` | Test | X |Test that trying to move a piece that doesn't exist on a tile fails. |
 | `testMoveWalkingMiddleNotConnected` | Test | X | Test that walking a path that is disconnected in the middle fails. |
 | `testMoveWalkingInPlaceFail` | Test | X | Test that walking in place fails. |
-| `testMoveWalkingInPlaceIntrudingFail` | Test | X | Test that walkign in place with intruding fails. |
+| `testMoveWalkingInPlaceIntrudingFail` | Test | X | Test that walking in place with intruding fails. |
 | `testMoveWalkingOnTopIntrudingMiddle` | Test | X | Test that walking over a creature with intruding succeeds. |
-| `testMoveWalkingOnFullIntrudingMiddle` | Test | X | Test that walkign over a full tile with intruding succeeds. |
+| `testMoveWalkingOnFullIntrudingMiddle` | Test | X | Test that walking over a full tile with intruding succeeds. |
+| -- | Refactor | X | Created variables to reduce code reuse. |
 | `testMoveFlyingInPlaceFail` | Test | X | Test that flying in place fails. |
 | `testMoveFlyingInPlaceIntrudingFail` | Test | X | Test that flying in place with intruding fails. |
 | `testMoveFlyingClose` | Test | X | Test that flying to a tile within distance succeeds. |
@@ -79,6 +79,8 @@
 | `testMoveJumpingNotDraggable` | Test | X | Test that jumping with a piece that is not "draggable" succeeds. |
 | `testMoveJumpingLandOnFull` | Test | X | Test that jumping to a linear, full tile fails. |
 | `testMoveJumpingKamikazeLandOnFull` | Test | X | Test that jumping to a linear, full tile with kamikaze succeeds. |
+| -- | Refactor | X | Refactored abilities to return a MoveResult for more descriptive messages. |
+| -- | Refactor | X | Created variables to reduce repeat code. |
 | `testOrderStaysMoveSearchBottom` | Test | X | Test that piece order on tiles is maintained when moving the bottom piece. |
 | `testOrderStaysMoveSearchTop` | Test | X | Test that piece order on tiles is maintained when moving the top piece. |
 | `testPlaceCreatureNotInInventory` | Test | X | Test that attempting to place a creature not in the player's inventory fails. |
@@ -90,6 +92,7 @@
 | `testSwappingEmpty` | Test | X | Test that landing on a non-occupied tile with swapping succeeds. |
 | `testSwappingButterflyFail` | Test | X | Test that landing on a butterfly with swapping does not swap the butterfly. |
 | `testSwappingFull` | Test | X | Test that landing on a full tile with kamikaze succeeds. |
+| -- | Refactor | X | Fixed draggability bug and added win/tie checks. |
 | `testPlaceBlueWin` | Test | X | Test that placing a piece to trigger a blue win succeeds. |
 | `testPlaceRedWin` | Test | X | Test that placing a piece to trigger a red win succeeds. |
 | `testMoveBlueWin` | Test | X | Test that moving a piece to trigger a blue win succeeds. |
@@ -102,16 +105,6 @@
 
 | Pattern | File | Description |  
 | :-----: | :--: | :---------- |  
-| Builder | `HexAroundFirstSubmission.java` | Used the builder design pattern to create a game manager builder. |  
-| Strategy | `HexAroundFirstSubmission.java` | Used a map to store an instance of each ability/attribute and called the `isValidMove()` and `takeEffect()` methods respectively. |
-| Factory | `HexCoordinate.java` | Used the factory method to create HexCoordinate instances.
-
----  
-
-# Sources
-
-| File | Source | Description |  
-| :--: | :----: | :---------- |  
-| `Board.java` | https://www.redblobgames.com/grids/hexagons/#map-storage | Used a hash table to store the board, which this recommends. |  
-| `Board.java` | https://www.redblobgames.com/grids/hexagons/#distances | Used the axial formula to calculate distances between axial coordinates. |  
-| Starter code | Canvas | Used the submission 1 starter code. |
+| Builder | `HexAroundFirstSubmission.java` | Used the builder design pattern to create a game manager builder without having to pass the entire configuration. |  
+| Strategy | `HexAroundFirstSubmission.java` | Used a map to store an instance of each ability/attribute and called the `isValidMove()` and `takeEffect()` methods respectively to eliminate needing to manually check what type of ability/attribute. |
+| Factory | `HexCoordinate.java` | Used the factory pattern to create HexCoordinate instances to eliminate needing to call the constructor every time. |
