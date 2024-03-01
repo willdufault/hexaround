@@ -32,7 +32,7 @@ public class Submission1Tests extends BaseTestMaster {
     private static boolean firstTest = true;
 
     private final int TEST_POINTS = 25;
-    private static IHexAround1 manager;
+    private static IHexAroundFinal manager;
     @AfterAll
     static void testBreakdown() {
         firstTest = true;

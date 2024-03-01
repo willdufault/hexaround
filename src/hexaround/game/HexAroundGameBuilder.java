@@ -24,13 +24,10 @@ import hexaround.game.board.*;
 import java.io.*;
 
 public class HexAroundGameBuilder {
-    // NOTE: CHANGED THE RETURN TYPE TO HexAroundFirstSubmission FOR TESTING IN FinalTest
-//    public static IHexAround1 buildGameManager(String configurationFile) throws IOException {
-    public static HexAroundFirstSubmission buildGameManager(String configurationFile) throws IOException {
+    public static IHexAroundFinal buildGameManager(String configurationFile) throws IOException {
         HexAroundConfigurationMaker configurationMaker =
             new HexAroundConfigurationMaker(configurationFile);
         GameConfiguration configuration = configurationMaker.makeConfiguration();
-//        System.out.println(configuration);
         HexAroundFirstSubmission gameManager = new HexAroundFirstSubmission();
 
         gameManager.setBoard(new HexAroundBoard());

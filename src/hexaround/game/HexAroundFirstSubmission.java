@@ -15,7 +15,7 @@ import java.util.*;
 
 import static hexaround.game.move.MoveResult.*;
 
-public class HexAroundFirstSubmission implements IHexAround1{
+public class HexAroundFirstSubmission implements IHexAroundFinal {
 
     private HexAroundBoard board = null;
     private Map<CreatureName, CreatureDefinition> creatureMap = null;
@@ -99,7 +99,7 @@ public class HexAroundFirstSubmission implements IHexAround1{
      * @param creature A creature name.
      * @return The CreatureProperty (movement ability) of this creature.
      */
-    public CreatureProperty getAbility(CreatureName creature) {
+    private CreatureProperty getAbility(CreatureName creature) {
         for(CreatureProperty property : this.creatureMap.get(creature).properties()) {
             if(this.abilityMap.containsKey(property)) {
                 return property;
@@ -114,7 +114,7 @@ public class HexAroundFirstSubmission implements IHexAround1{
      * @param creature A creature name.
      * @return A list of all attributes for the given creature.
      */
-    public LinkedList<CreatureProperty> getAttributes(CreatureName creature) {
+    private LinkedList<CreatureProperty> getAttributes(CreatureName creature) {
         LinkedList<CreatureProperty> attributes = new LinkedList<>();
 
         for(CreatureProperty property : this.creatureMap.get(creature).properties()) {
@@ -132,7 +132,7 @@ public class HexAroundFirstSubmission implements IHexAround1{
      * @param property A creature property.
      * @return True if the creature has the property.
      */
-    public boolean creatureHasProperty(CreatureName creature, CreatureProperty property) {
+    private boolean creatureHasProperty(CreatureName creature, CreatureProperty property) {
         return this.creatureMap.get(creature).properties().contains(property);
     }
 

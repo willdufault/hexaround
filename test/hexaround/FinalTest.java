@@ -15,8 +15,8 @@ public class FinalTest {
     String hgcTest = "configurations/TestConfiguration.hgc";
     String hgcTestAttributes = "configurations/TestConfigurationAttributes.hgc";
 
-    HexAroundFirstSubmission game1 = null;
-    HexAroundFirstSubmission game2 = null;
+    IHexAroundFinal game1 = null;
+    IHexAroundFinal game2 = null;
     // Move responses.
     MoveResponse legalMove = new MoveResponse(OK, "Legal move.");
     MoveResponse noPath = new MoveResponse(MOVE_ERROR, "No legal path exists.");
@@ -33,7 +33,6 @@ public class FinalTest {
     MoveResponse cantMoveSurrounded = new MoveResponse(MOVE_ERROR, "Flying pieces can't move when surrounded.");
 
     public FinalTest() throws IOException {
-        // TODO: NOTE: CHANGED buildGameManager() RETURN TYPE TO CALL GETTERS/SETTERS
         this.game1 = HexAroundGameBuilder.buildGameManager(hgcTest);
         this.game2 = HexAroundGameBuilder.buildGameManager(hgcTestAttributes);
     }
