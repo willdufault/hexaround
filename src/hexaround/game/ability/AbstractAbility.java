@@ -24,7 +24,8 @@ public abstract class AbstractAbility {
         int count = 0;
 
         for(HexCoordinate hex : makeCoordinate(fromX, fromY).neighbors()) {
-            if(!board.isOccupied(hex.x(), hex.y())) {
+            // TODO: JUST ADDED THE CONTAINS CHECK AND IT BROKE EVERYTHING, FIX THIS
+            if(!board.isOccupied(hex.x(), hex.y()) && toNeighbors.contains(hex)) {
                 count += 1;
 
                 if(count == 2) {

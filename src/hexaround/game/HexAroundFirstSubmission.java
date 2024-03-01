@@ -50,8 +50,8 @@ public class HexAroundFirstSubmission implements IHexAround1{
     /**
      * Given the x and y-coordinates for a hex, return the name
      * of the creature on that coordinate.
-     * @param x
-     * @param y
+     * @param x The x coordinate.
+     * @param y The y coordinate.
      * @return the name of the creature on (x, y), or null if there
      *  is no creature.
      */
@@ -61,11 +61,11 @@ public class HexAroundFirstSubmission implements IHexAround1{
     }
 
     /**
-     *
-     * @param x
-     * @param y
-     * @param index
-     * @return
+     * Get the creature at a given coordinate with a position at the tile.
+     * @param x The x coordinate.
+     * @param y The y coordinate.
+     * @param index The position at the tile.
+     * @return The creature's name.
      */
     public CreatureName getCreatureAt(int x, int y, int index) {
         return board.getCreatureAt(x, y, index);
@@ -127,20 +127,20 @@ public class HexAroundFirstSubmission implements IHexAround1{
     }
 
     /**
-     *
-     * @param creature
-     * @param property
-     * @return
+     * Determine if a creature has a given property.
+     * @param creature A creature name.
+     * @param property A creature property.
+     * @return True if the creature has the property.
      */
     public boolean creatureHasProperty(CreatureName creature, CreatureProperty property) {
         return this.creatureMap.get(creature).properties().contains(property);
     }
 
     /**
-     * Given the x and y-coordinate of a hex, determine if there is a
+     * Given the x and y coordinate of a hex, determine if there is a
      * piece on that hex on the board.
-     * @param x
-     * @param y
+     * @param x The x coordinate.
+     * @param y The y coordinate.
      * @return true if there is a piece on the hex, false otherwise.
      */
     @Override
@@ -155,10 +155,10 @@ public class HexAroundFirstSubmission implements IHexAround1{
      * You can assume that there will be a piece at (x1, y1).
      * The distance is just the distance between the two hexes. You
      * do not have to do any other checking.
-     * @param x1
-     * @param y1
-     * @param x2
-     * @param y2
+     * @param x1 The first x coordinate.
+     * @param y1 The first y coordinate.
+     * @param x2 The second x coordinate.
+     * @param y2 The second y coordinate.
      * @return true if the distance between the two hexes is less
      * than or equal to the maximum distance property for the piece
      * at (x1, y1). Return false otherwise.
@@ -197,39 +197,39 @@ public class HexAroundFirstSubmission implements IHexAround1{
     }
 
     /**
-     *
-     * @param team
-     * @param creature
-     * @return
+     * Determine if the given team has the given creature.
+     * @param team The team.
+     * @param creature The creature name.
+     * @return True if the player has the creature.
      */
     private boolean playerHasCreature(boolean team, CreatureName creature) {
         return this.playerInventories.get(team).containsKey(creature);
     }
 
     /**
-     *
-     * @param team
-     * @param creature
-     * @return
+     * Determine if the player has at least 1 of the given creature in their inventory.
+     * @param team The team.
+     * @param creature The creature name.
+     * @return True if the team can play the creature.
      */
     private boolean playerHasEnough(boolean team, CreatureName creature) {
         return this.playerInventories.get(team).get(creature) > 0;
     }
 
     /**
-     *
-     * @param team
-     * @param creature
-     * @param delta
+     * Update the count of a creature in a player's inventory.
+     * @param team The player team.
+     * @param creature A creature name.
+     * @param delta The change amount.
      */
     private void updateInventory(boolean team, CreatureName creature, int delta) {
         this.playerInventories.get(team).put(creature, this.playerInventories.get(team).get(creature) + delta);
     }
 
     /**
-     *
-     * @param team
-     * @return
+     * Determine if a given team's butterfly is surrounded.
+     * @param team The player team.
+     * @return True if the player's butterfly is surrounded.
      */
     private boolean isButterflySurrounded(boolean team) {
         HexCoordinate butterfly = board.getButterflyTile(team);
@@ -241,6 +241,10 @@ public class HexAroundFirstSubmission implements IHexAround1{
         return this.board.isSurrounded(butterfly.x(), butterfly.y());
     }
 
+    /**
+     * Get the current status of the game.
+     * @return The status of the game (blue win, red win, draw, continue game).
+     */
     private MoveResponse getGameOverStatus() {
         boolean blueSurrounded = this.isButterflySurrounded(true);
         boolean redSurrounded = this.isButterflySurrounded(false);
@@ -334,6 +338,8 @@ public class HexAroundFirstSubmission implements IHexAround1{
 
         // If this is non-empty, the creature is either kamikaze or swapping and can land on full tiles.
         LinkedList<CreatureProperty> attributes = this.getAttributes(creature);
+
+        // If the attempted move is legal or not.
         MoveResponse legalMoveResponse = this.abilityMap.get(this.getAbility(creature)).isLegalMove(this.board, creature,
                 this.team, this.creatureHasProperty(creature, CreatureProperty.INTRUDING), attributes.size() > 0,
                 fromX, fromY, toX, toY, this.creatureMap.get(creature).maxDistance());

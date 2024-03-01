@@ -32,15 +32,6 @@ public class FinalTest {
             "Distance between tiles must match the max distance.");
     MoveResponse cantMoveSurrounded = new MoveResponse(MOVE_ERROR, "Flying pieces can't move when surrounded.");
 
-
-    // TODO: TEMP
-
-    MoveResponse illegalMove = new MoveResponse(MOVE_ERROR, "TODO");
-
-
-    // TODO: TEST WITH THIS INTERFACE B/C HE MIGHT TEST WITH THIS.
-    // IHexAround1 game1 = null;
-
     public FinalTest() throws IOException {
         // TODO: NOTE: CHANGED buildGameManager() RETURN TYPE TO CALL GETTERS/SETTERS
         this.game1 = HexAroundGameBuilder.buildGameManager(hgcTest);
@@ -67,15 +58,15 @@ public class FinalTest {
     }
 
     @Test
+    void testEmptyHasProperty() {
+        assertFalse(this.game1.hasProperty(0, 0, CreatureProperty.WALKING));
+    }
+
+    @Test
     void testPieceNotHasProperty() {
         assertEquals(legalMove, this.game1.placeCreature(CRAB, 0, 0));
 
         assertFalse(this.game1.hasProperty(0, 0, CreatureProperty.FLYING));
-    }
-
-    @Test
-    void testEmptyHasProperty() {
-        assertFalse(this.game1.hasProperty(0, 0, CreatureProperty.WALKING));
     }
 
     @Test
@@ -190,7 +181,28 @@ public class FinalTest {
                 this.game1.placeCreature(CRAB, -3, 0));
 
         assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, -3, 0));
+    }
 
+    @Test
+    void testButterflyKamikazeRoundFourRequired() {
+        assertEquals(legalMove, this.game2.placeCreature(BUTTERFLY, 0, 0));
+        assertEquals(legalMove, this.game2.placeCreature(BUTTERFLY, 1, 0));
+
+        assertEquals(legalMove, this.game2.placeCreature(CRAB, -1, 0));
+        assertEquals(legalMove, this.game2.placeCreature(CRAB, 2, 0));
+
+        assertEquals(legalMove, this.game2.placeCreature(CRAB, -1, 1));
+        assertEquals(legalMove, this.game2.placeCreature(CRAB, 1, 1));
+
+        assertEquals(legalMove, this.game2.placeCreature(TURTLE, 0, -1));
+        assertEquals(legalMove, this.game2.placeCreature(CRAB, 2, -1));
+
+        assertEquals(legalMove, this.game2.moveCreature(TURTLE, 0, -1, 1, 0));
+
+        assertEquals(new MoveResponse(MOVE_ERROR, "Player must place their butterfly."),
+                this.game2.placeCreature(CRAB, 3, 0));
+
+        assertEquals(legalMove, this.game2.placeCreature(BUTTERFLY, 3, 0));
     }
 
     @Test
@@ -610,7 +622,7 @@ public class FinalTest {
     }
 
     @Test
-    void testMoveRunningExactIntruding1() {
+    void testMoveRunningExactIntruding() {
         assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 0, 0));
         assertEquals(legalMove, this.game1.placeCreature(BUTTERFLY, 1, 0));
 

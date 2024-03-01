@@ -28,20 +28,19 @@ import static hexaround.game.board.coordinate.HexCoordinate.*;
  */
 public class HexAroundBoard {
     private Map<HexCoordinate, LinkedList<CreaturePiece>> occupiedHexes = null;
-
     private HexCoordinate blueButterfly = null;
     private HexCoordinate redButterfly = null;
 
     public HexAroundBoard() {
-        occupiedHexes = new HashMap<>();
+        this.occupiedHexes = new HashMap<>();
     }
 
     /**
-     * @param x
-     * @param y
-     * @param index
-     * @return the Creature definition of the creature at (x, y) or
-     *  null if there is none.
+     * Get the creature at a given tile and position in the tile.
+     * @param x The x coordinate.
+     * @param y The y coordinate.
+     * @param index The position at the tile.
+     * @return the Creature definition of the creature at (x, y) or null if there is none.
      */
     public CreatureName getCreatureAt(int x, int y, int index) {
         HexCoordinate hex = makeCoordinate(x, y);
@@ -78,9 +77,9 @@ public class HexAroundBoard {
     }
 
     /**
-     *
-     * @param x
-     * @param y
+     * Get the list of creatures at a tile.
+     * @param x The x coordinate.
+     * @param y The y coordinate.
      * @return The list of creatures at the given position.
      */
     public LinkedList<CreaturePiece> getCreaturesAt(int x, int y) {
@@ -130,10 +129,10 @@ public class HexAroundBoard {
     }
 
     /**
-     *
-     * @param x
-     * @param y
-     * @param team
+     * Determine if a piece's neighbors contains at least one piece matching the given team.
+     * @param x The x coordinate.
+     * @param y The y coordinate.
+     * @param team The team to check for.
      * @return True if any neighboring tiles of (x, y) contain a piece on the given team.
      */
     public boolean neighborsContainTeam(int x, int y, boolean team) {
@@ -163,12 +162,19 @@ public class HexAroundBoard {
     }
 
     /**
-     * Recursively count all nodes directly connected to hex.
+     * Recursively count the number of connected hexes.
+     * @param hex The current hex coordinate.
+     * @param seen The hex coordinate seen so far.
+     * @return The size of this hex cluster.
      */
     private int getClusterSize(HexCoordinate hex, HashSet<HexCoordinate> seen) {
-        if(!this.occupiedHexes.containsKey(hex)) return 0;
+        if(!this.occupiedHexes.containsKey(hex)) {
+            return 0;
+        }
 
-        if(seen.contains(hex)) return 0;
+        if(seen.contains(hex)){
+            return 0;
+        }
         seen.add(hex);
 
         // Include this hex.
@@ -181,11 +187,11 @@ public class HexAroundBoard {
     }
 
     /**
-     *
-     * @param creature
-     * @param team
-     * @param x
-     * @param y
+     * Place a creature at the given position on the given team.
+     * @param creature A creature name.
+     * @param team A player team.
+     * @param x The x coordinate.
+     * @param y The y coordinate.
      */
     public void placeCreatureAt(CreatureName creature, boolean team, int x, int y) {
         int index = 0;
@@ -200,10 +206,9 @@ public class HexAroundBoard {
 
     /**
      * Put a creature on the board.
-     * @param creature
-     * @param x
-     * @param y
-     * @return true if okay, false if there is a piece on the location
+     * @param creature A creature name.
+     * @param x The x coordinate.
+     * @param y The y coordinate.
      */
     public void placeCreatureAt(CreatureName creature, boolean team, int x, int y, int index) {
         HexCoordinate hex = makeCoordinate(x, y);
@@ -214,16 +219,23 @@ public class HexAroundBoard {
         this.occupiedHexes.get(hex).add(index, new CreaturePiece(creature, team));
 
         if(creature.equals(CreatureName.BUTTERFLY)) {
-            if(team)
+            if (team) {
                 this.blueButterfly = hex;
+            }
 
-            else
+            else {
                 this.redButterfly = hex;
+            }
         }
     }
 
     /**
-     * Removes the creature at the given coordinate.
+     * Remove a creature from a coordinate.
+     * @param creature A creature name.
+     * @param team A player team.
+     * @param x The x coordinate.
+     * @param y The y coordinate.
+     * @return The position (index) of the creature at its hex.
      */
     public int removeCreature(CreatureName creature, boolean team, int x, int y) {
         HexCoordinate hex = makeCoordinate(x, y);

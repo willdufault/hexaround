@@ -55,9 +55,9 @@ public record HexCoordinate(int x, int y) {
     }
 
     /**
-     * @param otherCoordinate
-     * @return true if the other coordinate is in a straight
-     * line (defined by the coordinate type)
+     * Determine if two hex coordinates are in a straight line.
+     * @param otherCoordinate The other coordinate.
+     * @return true if the other coordinate is in a straight line (defined by the coordinate type)
      */
     public boolean isLinear(HexCoordinate otherCoordinate) {
         HexCoordinate other = otherCoordinate;
