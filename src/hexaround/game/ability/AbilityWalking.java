@@ -66,7 +66,7 @@ public class AbilityWalking extends AbstractAbility implements IAbility {
      * @param record A HashMap storing the highest number of moves remaining for each visited tile.
      * @return True if a path exists.
      */
-    public boolean pathExists(HexAroundBoard board, CreatureName creature, boolean team, boolean intruding,
+    private boolean pathExists(HexAroundBoard board, CreatureName creature, boolean team, boolean intruding,
                        int x, int y, int toX, int toY, int remaining, HashMap<HexCoordinate, Integer> record) {
         if(!board.isColonyConnected()) {
             return false;

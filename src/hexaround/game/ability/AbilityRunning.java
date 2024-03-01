@@ -62,7 +62,7 @@ public class AbilityRunning extends AbstractAbility implements IAbility {
      * @param visited A HashSet storing the visited tiles for each path.
      * @return True if a path exists.
      */
-    public boolean pathExists(HexAroundBoard board, CreatureName creature, boolean team, boolean intruding,
+    private boolean pathExists(HexAroundBoard board, CreatureName creature, boolean team, boolean intruding,
                               int x, int y, int toX, int toY, int remaining, HashSet<HexCoordinate> visited) {
         if(!board.isColonyConnected()) {
             return false;
