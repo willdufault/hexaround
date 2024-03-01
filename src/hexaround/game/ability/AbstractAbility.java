@@ -18,19 +18,13 @@ public abstract class AbstractAbility {
      * @return True if the piece at (fromX, fromY) can be dragged to (toX, toY).
      */
     public boolean canDrag(HexAroundBoard board, int fromX, int fromY, int toX, int toY) {
-        // Assuming the tile at (toX, toY) is not occupied, the tile at (fromX, fromY) must share at least 2 non-occupied
-        // neighbors with the tile at (toX, toY).
+        // Assuming the tile at (toX, toY) is not occupied, the tile at (fromX, fromY) must share at least 1 non-occupied
+        // neighbor with the tile at (toX, toY).
         HashSet<HexCoordinate> toNeighbors = new HashSet<>(makeCoordinate(toX, toY).neighbors());
-        int count = 0;
 
         for(HexCoordinate hex : makeCoordinate(fromX, fromY).neighbors()) {
-            // TODO: JUST ADDED THE CONTAINS CHECK AND IT BROKE EVERYTHING, FIX THIS
             if(!board.isOccupied(hex.x(), hex.y()) && toNeighbors.contains(hex)) {
-                count += 1;
-
-                if(count == 2) {
-                    return true;
-                }
+                return true;
             }
         }
 
